@@ -169,7 +169,8 @@ async function closeWithComment(github, context, number, body) {
 }
 
 async function sweep({ github, context, core, dryRun }) {
-  const exemptions = parseExemptions(fs.readFileSync(EXEMPTIONS_PATH, "utf8"));
+  const { vouched } = parseVouchList(fs.readFileSync(VOUCHED_PATH, "utf8"));
+  const exemptions = new Set([...parseExemptions(fs.readFileSync(EXEMPTIONS_PATH, "utf8")), ...vouched]);
   const repo = { owner: context.repo.owner, repo: context.repo.repo };
 
   const list = async () => {
@@ -337,7 +338,7 @@ async function enforceOpenLimit({ github, context, core, dryRun }) {
     [
       `Closing: ${author} already has ${OPEN_LIMIT} or more open PRs here, which is the limit for contributors who are not vouched.`,
       "",
-      `Once one of them is merged or closed, open this again. See the [open PR limit](${guideLink(context, "open-pr-limit")}).`,
+      `Once one of them is merged or closed, open a new PR from this branch. See the [open PR limit](${guideLink(context, "open-pr-limit")}).`,
     ].join("\n"),
   );
   core.info(`PR #${pr.number}: closed, ${author} has ${others} other open PRs.`);

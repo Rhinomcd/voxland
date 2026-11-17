@@ -5,7 +5,7 @@
 - Navigate to `https://canary.discord.com/app`
 - Ensure the ConsoleShortcuts plugin is enabled. Run `Vencord.Settings.plugins.ConsoleShortcuts.enabled = true` to enable it
 It exports many useful helpers as `window.shortcutList`
-- Ensure a user is logged in. `AuthenticationStore.getId()` should return an id once Discord loaded. If not, ask the developer to log in with an alt account set up for testing, never their main account. Follow the account rules in [AGENTS.md](../AGENTS.md#the-four-ways-to-cause-real-harm)
+- Ensure a user is logged in. `AuthenticationStore.getId()` should return an id once Discord loaded. If not, ask the developer to log in with an alt account set up for testing, never their main account. If someone is already logged in, confirm with the developer that it is their test alt before you do anything else. Follow the account rules in [AGENTS.md](../AGENTS.md#the-four-ways-to-cause-real-harm)
 
 ## Reverse Engineering
 

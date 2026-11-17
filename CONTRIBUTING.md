@@ -47,7 +47,7 @@ Fix one problem or add one thing. Include every change it needs, tests and docs 
 
 Say how you checked the change and what you saw. "Tests pass" and "the build is green" are not evidence. Run it in a real Discord client.
 
-CodeRabbit and Macroscope review every PR. Fix or answer their findings before you ask for human review.
+CodeRabbit and Macroscope review every PR. Fix or answer their findings before you ask for human review. If a bot hasn't posted within a day, ask for human review anyway.
 
 UI changes need before and after screenshots. Add a short video when the change involves motion or timing. Upload them to the PR; don't commit them. Redact other people's names, avatars, and messages.
 
@@ -55,7 +55,7 @@ UI changes need before and after screenshots. Add a short video when the change 
 
 ### 3 open PRs per person
 
-You can have 3 open PRs. A fourth is closed automatically when you open it. Get one merged or closed, then reopen it.
+You can have 3 open PRs. A fourth is closed automatically when you open it. Once one of the others is merged or closed, open a new PR from the same branch.
 
 <a id="conflict-window"></a>
 
@@ -93,6 +93,8 @@ A blocked account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with 
 ## When your PR is closed
 
 A PR that breaks a rule gets a notice naming the rule and how to fix it. The PR closes 72 hours later. A reply or a push in that time sends it back for another look.
+
+Maintainers post the notice as a comment first, then add the `triage:closing` label. Activity more than 15 seconds after the label clears it. The `triage:keep-open` label exempts a PR from every automatic rule.
 
 After it closes, fix the problem and comment on the PR, or open a focused replacement PR that links the old one.
 
