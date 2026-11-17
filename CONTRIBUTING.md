@@ -19,7 +19,7 @@ Report Voxland bugs here, never to Vencord or Vesktop. They don't support forks,
 - **Label agent posts.** When an agent posts an issue, comment, or review for you, the post says so and names the model.
 - **Test on an alt account.** Discord bans accounts that act like bots. Point agents at an alt account you set up for testing, never your main one.
 - **No unattended agents.** Don't let an agent file issues or PRs here on its own. A human reads every post before it goes out. Repeated automated floods get their owner [blocked](#blocks).
-- **Leave upstream alone.** Vencord, Vesktop, and Equicord ban AI-assisted contributions. Respect that. Don't send them Voxland work, and don't point agents at their repos or Discord servers.
+- **Leave upstream alone.** Vencord, Vesktop, and Equicord are hostile to AI-assisted contributions and block contributors over them. Respect that. Don't send them Voxland work, and don't point agents at their repos or Discord servers.
 
 <a id="rules-for-a-pr"></a>
 
