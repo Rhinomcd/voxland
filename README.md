@@ -47,6 +47,8 @@ pnpm build --dev
 pnpm inject
 ```
 
+For the Linux desktop app, see [voxland-desktop](https://github.com/Rhinomcd/voxland-desktop).
+
 ## Community
 
 Ask questions in [Q&A](https://github.com/Rhinomcd/voxland/discussions/categories/q-a), propose features and plugins in [Ideas](https://github.com/Rhinomcd/voxland/discussions/categories/ideas), and report bugs in [issues](https://github.com/Rhinomcd/voxland/issues). Don't report Voxland bugs to Vencord.
