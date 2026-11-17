@@ -1,15 +1,31 @@
 <!--
-Before submitting your PR:
-- We do not accept AI slop! You will be blocked if you submit AI slop!
-- Read https://github.com/Vendicated/Vencord/blob/main/CONTRIBUTING.md
+Read CONTRIBUTING.md before opening a PR. Following the rules doesn't guarantee a
+merge, but a closed PR always gets a reason. Solve one problem. Drafts follow the same rules.
+Title: "PluginName: what changed", or a plain sentence for core changes.
 -->
 
-## Describe your Changes
+## Problem
 
-## Screenshots (if applicable)
+<!-- The problem in a sentence or two: what happens, what should happen, how to
+reproduce it. -->
 
-## Checklist before submitting
-<!-- Hint: [x] this is how to check boxes -->
-- [ ] I have read the [contribution rules](https://github.com/Vendicated/Vencord/blob/main/CONTRIBUTING.md) and made sure this pull request complies with it
-- [ ] This pull request was written by me, and not an AI agent. <!-- Don't bother lying, we will know and you will be banned -->
-- [ ] I understand that if any of the above conditions are not met, this pull request will be closed and I will be banned from future contributions without further warning
+## Change
+
+<!-- How this fixes it. If it touches several areas, say why the fix needs each one. -->
+
+## Scope
+
+<!-- For a new feature, new plugin, or behavior change, link the approved Ideas
+discussion. For a bug fix, link the issue if there is one. -->
+
+## Verification
+
+<!-- What you ran or clicked in a real Discord client, and what you saw. State
+anything you could not check. "Tests pass" alone is not evidence.
+
+UI changes need before and after screenshots; add a short recording for motion or
+timing. Upload them here, never commit them, and redact other people's names,
+avatars, and messages. -->
+
+<!-- Last line: the model and harness that did the work, e.g.
+"Claude Opus 5.5 via Claude Code", or "No AI". -->
