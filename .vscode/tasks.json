@@ -7,7 +7,7 @@
             "label": "Build",
             "detail": "Build vencord in development mode",
             "type": "shell",
-            "command": "pnpm build --dev",
+            "command": "vp run build --dev",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -17,7 +17,7 @@
             "label": "Reporter",
             "detail": "Build with the reporter that will test all patches and finds, then report errors to console",
             "type": "shell",
-            "command": "pnpm build --dev --reporter",
+            "command": "vp run build --dev --reporter",
             "group": {
                 "kind": "build"
             }
@@ -26,7 +26,7 @@
             "label": "Watch",
             "detail": "Build and watch for changes",
             "type": "shell",
-            "command": "pnpm watch",
+            "command": "vp run watch",
             "problemMatcher": [],
             "group": {
                 "kind": "build"
