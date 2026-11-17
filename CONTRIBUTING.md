@@ -2,7 +2,7 @@
 
 Voxland is a Discord client mod for people who build with coding agents. Use Claude Code, Codex, Cursor, or whatever helps you. We care about the change and the person who stands behind it, not about which tool typed it.
 
-Agents make code cheap to write, and reviewing it is still slow. These rules keep review fair to the people who do it, and keep Discord users and upstream projects from getting hurt by what we build.
+Agents make code cheap to write, and reviewing it is still slow. These rules keep review fair to the people who do it, and keep Discord users and upstream projects from getting hurt by what we build. Tools and models change quickly, so we revise these rules often and in the open.
 
 ## Before you write code
 
@@ -17,22 +17,23 @@ Report Voxland bugs here, never to Vencord or Vesktop. They don't support forks,
 - **A human owns every PR.** You read the whole diff before you open the PR. You can explain what it does and how it fits the rest of the code. When a reviewer asks a question, you answer it. An agent may help you draft the reply, but you send it and stand behind it.
 - **Disclose the tools.** End every PR body with the model and harness that did the work, such as `Claude Opus 5.5 via Claude Code`, or `No AI`. Any model is accepted.
 - **Label agent posts.** When an agent posts an issue, comment, or review for you, the post says so and names the model.
-- **No unattended agents.** Don't let an agent file issues or PRs here on its own. A human reads every post before it goes out. Bulk automated posts get their owner [banned](#bans).
+- **Test on an alt account.** Discord bans accounts that act like bots. Point agents at an alt account you set up for testing, never your main one.
+- **No unattended agents.** Don't let an agent file issues or PRs here on its own. A human reads every post before it goes out. Repeated automated floods get their owner [blocked](#blocks).
 - **Leave upstream alone.** Vencord, Vesktop, and Equicord ban AI-assisted contributions. Respect that. Don't send them Voxland work, and don't point agents at their repos or Discord servers.
 
 <a id="rules-for-a-pr"></a>
 
 ## Rules for a PR
 
-These rules apply to every PR from outside the maintainer team, drafts included. The team is the logins in [.github/TRIAGE_EXEMPTIONS.td](.github/TRIAGE_EXEMPTIONS.td). Following the rules doesn't guarantee a review or a merge.
+These rules apply to every PR, drafts included, whether a person, an agent, or both wrote it. Maintainers, the logins in [.github/TRIAGE_EXEMPTIONS.td](.github/TRIAGE_EXEMPTIONS.td), are exempt only from the open PR limit and the conflict window. Following the rules doesn't guarantee a merge, but a closed PR always gets a reason.
 
 <a id="discuss-first"></a>
 
 ### Discuss first
 
-A small fix for an obvious bug needs no discussion. A larger fix links the issue that shows the bug.
+Bug fixes can go straight to a PR. Link the issue if there is one.
 
-Everything else needs a maintainer's agreement before you start. That covers new plugins, new features, behavior changes, refactors, and dependency changes. Open an [Ideas discussion](https://github.com/Rhinomcd/voxland/discussions/categories/ideas), wait for a maintainer to approve it, and link it from the PR.
+New features, new plugins, and changes to existing behavior need a maintainer's agreement before you build them. Open an [Ideas discussion](https://github.com/Rhinomcd/voxland/discussions/categories/ideas), wait for a maintainer to approve it, and link it from the PR.
 
 <a id="one-problem"></a>
 
@@ -45,6 +46,8 @@ Fix one problem or add one thing. Include every change it needs, tests and docs 
 ### Show that it works
 
 Say how you checked the change and what you saw. "Tests pass" and "the build is green" are not evidence. Run it in a real Discord client.
+
+CodeRabbit and Macroscope review every PR. Fix or answer their findings before you ask for human review.
 
 UI changes need before and after screenshots. Add a short video when the change involves motion or timing. Upload them to the PR; don't commit them. Redact other people's names, avatars, and messages.
 
@@ -77,14 +80,13 @@ Plugins must not hurt the people who use them or the people they talk to. Plugin
 - No raw DOM manipulation. Use patches and React.
 - Add a dependency only when nothing in the codebase can do the job.
 
-<a id="bans"></a>
+<a id="blocks"></a>
 
-## Bans
+## Blocks
 
-- If you flood us with automated issues or PRs, you will be banned.
-- If you make reviewers' lives harder, you will be banned. Examples: repeated pings, fighting over a closure, a second account to get around a limit, or pasting agent replies you didn't read.
+Blocks are a last resort. We block an account for harassment or for repeated, deliberate spam, such as floods of automated issues or PRs, or a second account made to get around the open PR limit. We never block for a single PR that misses the bar. We close it and say why.
 
-A banned account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with the reason. Any issue or PR it opens is closed when it is opened.
+A blocked account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with the reason. Any issue or PR it opens is closed when it is opened.
 
 <a id="closure-and-reconsideration"></a>
 

@@ -1,6 +1,6 @@
 <!--
 Read CONTRIBUTING.md before opening a PR. Following the rules doesn't guarantee a
-review or a merge. Solve one problem. Drafts follow the same rules.
+merge, but a closed PR always gets a reason. Solve one problem. Drafts follow the same rules.
 Title: "PluginName: what changed", or a plain sentence for core changes.
 -->
 
@@ -15,9 +15,8 @@ reproduce it. -->
 
 ## Scope
 
-<!-- Link the approved Ideas discussion for a feature, plugin, refactor, or
-behavior change. Link the issue for a larger bug fix. For a small obvious fix,
-say why it needs neither. -->
+<!-- For a new feature, new plugin, or behavior change, link the approved Ideas
+discussion. For a bug fix, link the issue if there is one. -->
 
 ## Verification
 

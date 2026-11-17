@@ -309,7 +309,7 @@ async function enforceOpenLimit({ github, context, core, dryRun }) {
       github,
       context,
       pr.number,
-      `Closing: ${author} is banned from contributing here, so this PR will not be reviewed. See [bans](${guideLink(context, "bans")}).`,
+      `Closing: ${author} is blocked from contributing here, so this PR will not be reviewed. See [blocks](${guideLink(context, "blocks")}).`,
     );
     core.info(`PR #${pr.number}: closed, ${author} is denounced.`);
     return;

@@ -45,7 +45,7 @@ Plugins must follow the [plugin rules](CONTRIBUTING.md#plugin-rules). The rule a
 ## Pull requests
 
 - Follow [CONTRIBUTING.md](CONTRIBUTING.md). The rules apply to agent-written PRs exactly as they apply to human ones.
-- A feature, plugin, or refactor needs a maintainer-approved [Ideas discussion](https://github.com/Rhinomcd/voxland/discussions/categories/ideas). Link it. A small fix for an obvious bug doesn't.
+- A new feature, new plugin, or change to existing behavior needs a maintainer-approved [Ideas discussion](https://github.com/Rhinomcd/voxland/discussions/categories/ideas). Link it. A bug fix doesn't.
 - One problem per PR.
 - Titles follow the repo's convention: `PluginName: what changed`, or a plain sentence for core changes.
 - Use the [PR template](.github/pull_request_template.md). Show how you verified the change on a real Discord client. "Tests pass" is not evidence.

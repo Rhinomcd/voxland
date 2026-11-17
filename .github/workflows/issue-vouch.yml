@@ -98,7 +98,7 @@ jobs:
                             owner,
                             repo,
                             issue_number: issue.number,
-                            body: `Closing: ${issue.user.login} is banned from contributing here, so this issue will not be triaged. See [bans](https://github.com/${owner}/${repo}/blob/main/CONTRIBUTING.md#bans).`,
+                            body: `Closing: ${issue.user.login} is blocked from contributing here, so this issue will not be triaged. See [blocks](https://github.com/${owner}/${repo}/blob/main/CONTRIBUTING.md#blocks).`,
                           });
                           await github.rest.issues.update({
                             owner,
