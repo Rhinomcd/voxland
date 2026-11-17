@@ -64,9 +64,9 @@ Vouched contributors in [.github/VOUCHED.td](.github/VOUCHED.td) are exempt from
 
 ## Plugin rules
 
-Plugins must not hurt the people who use them or the people they talk to.
+Plugins must not hurt the people who use them or the people they talk to. Plugins inherited from Vencord predate these rules; new plugins and changes to existing ones must follow them.
 
-- **Third-party data stays opt-in.** A plugin that sends message content, user data, or media to a third party, an LLM included, must be off by default, name the service in its description, and send only what the user explicitly picks. Never send other people's content in the background.
+- **Other people's data stays opt-in.** A plugin that sends message content, attachments, or other users' data to a third party, an LLM included, must be off by default and name the service in its description. Message content and attachments go only when the user acts on that specific message, such as clicking Translate. Never send them in the background.
 - **Self-hosted services need a discussion.** Popular services like Google or GitHub are fine. A plugin that talks to a server run by the plugin's author needs maintainer approval first.
 - No selfbots or API spam: animated statuses, message pruners, auto replies, Nitro snipers, quest automation, and the like.
 - No FakeDeafen, FakeMute, or StereoMic.

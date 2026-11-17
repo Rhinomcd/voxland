@@ -40,7 +40,7 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 
 ## Plugins
 
-Plugins must follow the [plugin rules](CONTRIBUTING.md#plugin-rules). The rule agents most often miss: a plugin that sends message content, user data, or media to any third party, an LLM included, must be off by default and send only what the user explicitly picks.
+Plugins must follow the [plugin rules](CONTRIBUTING.md#plugin-rules). The rule agents most often miss: a plugin that sends message content, attachments, or other users' data to a third party, an LLM included, must be off by default and name the service. Message content goes only when the user acts on that specific message.
 
 ## Pull requests
 
