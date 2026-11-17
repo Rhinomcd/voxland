@@ -86,7 +86,7 @@ Plugins must not hurt the people who use them or the people they talk to. Plugin
 
 Blocks are a last resort. We block an account for harassment or for repeated, deliberate spam, such as floods of automated issues or PRs, or a second account made to get around the open PR limit. We never block for a single PR that misses the bar. We close it and say why.
 
-A blocked account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with the reason. Any issue or PR it opens is closed when it is opened.
+A blocked account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with the reason. Any issue or PR it opens is closed when it is opened. Blocking a maintainer also removes them from [.github/TRIAGE_EXEMPTIONS.td](.github/TRIAGE_EXEMPTIONS.td) and revokes their write access.
 
 <a id="closure-and-reconsideration"></a>
 
@@ -94,12 +94,12 @@ A blocked account is denounced in [.github/VOUCHED.td](.github/VOUCHED.td) with 
 
 A PR that breaks a rule gets a notice naming the rule and how to fix it. The PR closes 72 hours later. A reply or a push in that time sends it back for another look.
 
-Maintainers post the notice as a comment first, then add the `triage:closing` label. Activity more than 15 seconds after the label clears it. The `triage:keep-open` label exempts a PR from every automatic rule.
+Maintainers post the notice as a comment, then add the `triage:closing` label right away. Activity more than 15 seconds after the label clears it. The `triage:keep-open` label exempts a PR from every automatic rule.
 
 After it closes, fix the problem and comment on the PR, or open a focused replacement PR that links the old one.
 
 ## Setup
 
-Voxland builds like Vencord. Install dependencies with `pnpm install`, then build with `pnpm build --dev` for the desktop app or `pnpm buildWeb --dev` for the browser extension. [AGENTS.md](AGENTS.md) has the checks to run before a PR.
+Voxland builds like Vencord. Install dependencies with `pnpm install`, then build with `pnpm build --dev` to inject into Discord's own desktop client or `pnpm buildWeb --dev` for the browser extension. [AGENTS.md](AGENTS.md) has the checks to run before a PR.
 
 These rules are adapted from [T3 Code's](https://github.com/pingdotgg/t3code/blob/main/CONTRIBUTING.md), with credit to its maintainers.
