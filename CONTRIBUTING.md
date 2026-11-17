@@ -100,6 +100,6 @@ After it closes, fix the problem and comment on the PR, or open a focused replac
 
 ## Setup
 
-Voxland builds like Vencord. Install dependencies with `pnpm install`, then build with `pnpm build --dev` to inject into Discord's own desktop client or `pnpm buildWeb --dev` for the browser extension. [AGENTS.md](AGENTS.md) has the checks to run before a PR.
+Voxland builds like Vencord. Install dependencies with `vp install`, then build with `vp run build --dev` to inject into Discord's own desktop client or `vp run buildWeb --dev` for the browser extension. [AGENTS.md](AGENTS.md) has the checks to run before a PR.
 
 These rules are adapted from [T3 Code's](https://github.com/pingdotgg/t3code/blob/main/CONTRIBUTING.md), with credit to its maintainers.

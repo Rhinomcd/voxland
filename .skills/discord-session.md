@@ -2,7 +2,7 @@
 
 - Before you open Discord, ask the developer which account the Chromium profile is logged in to. Continue only with an alt account set up for testing, never their main account
 - Run Chromium and use the Chrome Devtools MCP to control it
-- Build the web extension with `pnpm buildWeb --dev` and install it from `dist/chromium-unpacked`. Rebuild and reload as needed
+- Build the web extension with `vp run buildWeb --dev` and install it from `dist/chromium-unpacked`. Rebuild and reload as needed
 - Navigate to `https://canary.discord.com/app`
 - Ensure the ConsoleShortcuts plugin is enabled. Run `Vencord.Settings.plugins.ConsoleShortcuts.enabled = true` to enable it
 It exports many useful helpers as `window.shortcutList`

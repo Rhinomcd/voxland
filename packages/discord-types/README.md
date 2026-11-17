@@ -9,7 +9,7 @@ While it was primarily created for Vencord, other client mods could also benefit
 ```bash
 npm install -D @vencord/discord-types
 yarn add -D @vencord/discord-types
-pnpm add -D @vencord/discord-types
+vp add -D @vencord/discord-types
 ```
 
 ## Example Usage

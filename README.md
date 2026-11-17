@@ -42,9 +42,9 @@ These apply to every PR, whether a person, an agent, or both wrote it.
 There are no Voxland releases yet. Build from source and inject it into your Discord install:
 
 ```sh
-pnpm install
-pnpm build --dev
-pnpm inject
+vp install
+vp run build --dev
+vp run inject
 ```
 
 For the Linux desktop app, see [voxland-desktop](https://github.com/Rhinomcd/voxland-desktop).
