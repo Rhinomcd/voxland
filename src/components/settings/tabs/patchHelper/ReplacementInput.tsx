@@ -65,10 +65,8 @@ export function ReplacementInput({ replacement, setReplacement }: ReplacementInp
     }
 
     useEffect(() => {
-        if (isFunc)
-            onChange(replacement.toString());
-        else
-            setError(void 0);
+        if (!isFunc) setError(void 0);
+        else if (typeof replacement === "string") onChange(replacement);
     }, [isFunc]);
 
     return (
