@@ -105,6 +105,8 @@ ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, () => {
 
 if (IS_REPORTER) {
     ipcMain.handle(IpcEvents.REPORTER_SAVE_PATCH_FIXTURES, async (_, buildNumber: number, modules: Array<[moduleId: string, source: string]>) => {
+        if (!Number.isInteger(buildNumber)) throw new Error(`Invalid build number ${buildNumber}`);
+
         const dir = join(__dirname, "..", "patch-fixtures");
         const file = join(dir, `${buildNumber}.json`);
         await mkdir(dir, { recursive: true });

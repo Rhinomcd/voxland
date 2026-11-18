@@ -11,7 +11,9 @@ import { readdir, readFile } from "fs/promises";
 import { join } from "path";
 import vm from "vm";
 
-import { commonOpts, commonRendererPlugins, globPlugins } from "./build/common.mjs";
+// common.mjs reads build flags from argv; --reporter makes globPlugins include every plugin, as the reporter build does
+process.argv.push("--reporter");
+const { commonOpts, commonRendererPlugins, globPlugins } = await import("./build/common.mjs");
 
 const FIXTURES_DIR = "patch-fixtures";
 
@@ -69,8 +71,8 @@ const stub = new Proxy(function () { }, {
 });
 const g = /** @type {any} */ (globalThis);
 g.window = g;
-for (const name of ["document", "localStorage", "location", "VencordNative", "Worker", "MutationObserver", "HTMLElement", "Element", "Node"]) {
-    g[name] = stub;
+for (const name of ["document", "navigator", "localStorage", "location", "VencordNative", "Worker", "MutationObserver", "HTMLElement", "Element", "Node"]) {
+    Object.defineProperty(g, name, { value: stub, configurable: true });
 }
 vm.runInThisContext(outputFiles[0].text);
 
@@ -91,6 +93,7 @@ for (const fixtureFile of fixtureFiles) {
     /** @type {Array<[moduleId: string, source: string]>} */
     const modules = JSON.parse(await readFile(join(FIXTURES_DIR, fixtureFile), "utf-8"));
     const pending = [...registered];
+    const matchedPatches = new Set();
 
     console.log(`Build ${build}: ${registered.length} patches against ${modules.length} modules`);
 
@@ -107,6 +110,7 @@ for (const fixtureFile of fixtureFiles) {
         }
 
         for (const patch of matched) {
+            matchedPatches.add(patch);
             if (patch.fromBuild != null || patch.toBuild != null) {
                 console.log(`     ${patch.plugin}: build-ranged patch ${patch.find} matched module ${moduleId}`);
             }
@@ -116,7 +120,7 @@ for (const fixtureFile of fixtureFiles) {
     for (const patch of registered) {
         if (isOutsideBuild(patch, buildNumber)) {
             console.log(`     ${patch.plugin}: build-ranged patch ${patch.find} skipped, outside build ${build}`);
-        } else if (!patch.all && pending.includes(patch)) {
+        } else if (!matchedPatches.has(patch)) {
             fail(`${patch.plugin}: ${patch.find} found no module`);
         }
     }

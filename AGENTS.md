@@ -37,7 +37,7 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 
 ## Offline patch check
 
-`vp run checkPatches` runs every plugin patch through `applyPatches` against saved Discord modules, without Discord. It prints `FAIL <Plugin>: …` for each patch whose find matches no module, whose replacement has no effect, or whose result doesn't compile, and exits non-zero. Patches with `fromBuild`/`toBuild` print the module they matched, or that the saved build is outside their range.
+`vp run checkPatches` runs every plugin's patches, as the reporter registers them, through `applyPatches` against saved Discord modules, without Discord. It prints `FAIL <Plugin>: …` for each patch whose find matches no module (including `all` patches, which the reporter doesn't flag), whose replacement has no effect, or whose result doesn't compile, and exits non-zero. Patches with `fromBuild`/`toBuild` print the module they matched, or that the saved build is outside their range.
 
 The saved modules are Discord's code, so they stay out of git in `patch-fixtures/`. Refresh them when Discord updates:
 
