@@ -69,7 +69,7 @@ waitFor(["show", "close"], m => Alerts = m);
 
 export const showToast: t.showToast = proxyLazyWebpack(() => {
     const Toaster = findByCode(".currentToastMap.get(", "setState");
-    if (Toaster) return Toaster;
+    if (Toaster || IS_REPORTER) return Toaster;
 
     const logger = new Logger("Toast");
     logger.error("Failed to find showToast! Falling back to logging");
