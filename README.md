@@ -55,7 +55,7 @@ Ask questions in [Q&A](https://github.com/Rhinomcd/voxland/discussions/categorie
 
 ## Credits
 
-Voxland is built on [Vencord](https://github.com/Vendicated/Vencord) by Vendicated and contributors. If you enjoy it, consider [sponsoring Vendicated](https://github.com/sponsors/Vendicated).
+Voxland is built on [Vencord](https://github.com/Vendicated/Vencord) by Vendicated and contributors.
 
 ## Disclaimer
 
