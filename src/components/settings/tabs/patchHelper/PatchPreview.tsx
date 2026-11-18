@@ -19,12 +19,16 @@ if (!IS_STANDALONE) {
 }
 
 export interface ReplacementDraft {
+    id: number;
     match: string;
     flags: string;
     replace: string | ReplaceFn;
 }
 
-export const emptyReplacement: ReplacementDraft = { match: "", flags: "", replace: "" };
+let nextDraftId = 0;
+export function makeReplacementDraft(draft: Omit<ReplacementDraft, "id"> = { match: "", flags: "", replace: "" }): ReplacementDraft {
+    return { id: nextDraftId++, ...draft };
+}
 
 interface PatchPreviewProps {
     module: [id: number, factory: Function];
@@ -134,13 +138,16 @@ export function PatchPreview({ module, find, group, replacements }: PatchPreview
         const source = String(factory);
         const matches = new Map<PatchReplacement, unknown[]>();
         const result = applyPatches(source, [patch], -1, {
-            compile: code => Function(code),
+            compile: code => (0, eval)(code),
             wrapReplace(_, r, rewrite) {
-                rewrite(r.match, (...args) => {
+                const match = r.match as RegExp;
+                const { lastIndex } = match;
+                rewrite(match, (...args) => {
                     if (!matches.has(r)) matches.set(r, args);
                     return args[0];
                 });
-                return rewrite(r.match, r.replace);
+                match.lastIndex = lastIndex;
+                return rewrite(match, r.replace);
             }
         });
 

@@ -31,7 +31,7 @@ import { search } from "@webpack";
 import { React, TextInput, useMemo, useState } from "@webpack/common";
 
 import { FullPatchInput } from "./FullPatchInput";
-import { emptyReplacement, PatchPreview, ReplacementDraft } from "./PatchPreview";
+import { makeReplacementDraft, PatchPreview, ReplacementDraft } from "./PatchPreview";
 import { CheatSheet, ReplacementInput } from "./ReplacementInput";
 
 const findCandidates = debounce(function ({ find, setModule, setError }) {
@@ -65,7 +65,7 @@ function indent(code: string, depth: number) {
 
 function PatchHelper() {
     const [find, setFind] = useState("");
-    const [replacements, setReplacements] = useState<ReplacementDraft[]>([emptyReplacement]);
+    const [replacements, setReplacements] = useState<ReplacementDraft[]>(() => [makeReplacementDraft()]);
     const [group, setGroup] = useState(false);
 
     const [parsedFind, setParsedFind] = useState<string | RegExp>("");
@@ -110,7 +110,7 @@ function PatchHelper() {
         }
     }
 
-    function updateReplacement(index: number, change: Partial<ReplacementDraft>) {
+    function updateReplacement(index: number, change: Partial<Omit<ReplacementDraft, "id">>) {
         setReplacements(rs => rs.with(index, { ...rs[index], ...change }));
     }
 
@@ -133,7 +133,7 @@ function PatchHelper() {
             />
 
             {replacements.map((r, i) => (
-                <React.Fragment key={i}>
+                <React.Fragment key={r.id}>
                     {i > 0 && <Divider className={Margins.top16} />}
                     <Heading className={classes(Margins.top8, Margins.bottom8)}>Match{r.flags && ` (flags: ${r.flags})`}</Heading>
                     <TextInput
@@ -157,7 +157,7 @@ function PatchHelper() {
             ))}
 
             <Flex className={Margins.top16}>
-                <Button variant="secondary" onClick={() => setReplacements(rs => [...rs, emptyReplacement])}>
+                <Button variant="secondary" onClick={() => setReplacements(rs => [...rs, makeReplacementDraft()])}>
                     Add replacement
                 </Button>
             </Flex>

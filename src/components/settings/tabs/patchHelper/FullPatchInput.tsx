@@ -9,7 +9,7 @@ import { Margins } from "@utils/margins";
 import { Patch } from "@utils/types";
 import { TextArea, useEffect, useRef, useState } from "@webpack/common";
 
-import { emptyReplacement, ReplacementDraft } from "./PatchPreview";
+import { makeReplacementDraft, ReplacementDraft } from "./PatchPreview";
 
 export interface FullPatchInputProps {
     setFind(v: string): void;
@@ -30,7 +30,7 @@ export function FullPatchInput({ setFind, setParsedFind, setReplacements, setGro
 
             setFind("");
             setParsedFind("");
-            setReplacements([emptyReplacement]);
+            setReplacements([makeReplacementDraft()]);
             setGroup(false);
             return;
         }
@@ -49,8 +49,8 @@ export function FullPatchInput({ setFind, setParsedFind, setReplacements, setGro
                 if (replace == null) throw new Error("No 'replacement.replace' field");
 
                 return match instanceof RegExp
-                    ? { match: match.source, flags: match.flags, replace }
-                    : { match, flags: "", replace };
+                    ? makeReplacementDraft({ match: match.source, flags: match.flags, replace })
+                    : makeReplacementDraft({ match, flags: "", replace });
             }));
             setFind(find instanceof RegExp ? `/${find.source}/` : find);
             setParsedFind(find);
