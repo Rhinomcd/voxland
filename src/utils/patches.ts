@@ -131,8 +131,8 @@ export interface ApplyPatchesResult<T> {
     diagnostics: PatchDiagnostic[];
 }
 
-function isOutsideBuild({ fromBuild, toBuild }: Pick<Patch, "fromBuild" | "toBuild">, buildNumber: number) {
-    return buildNumber !== -1 && ((fromBuild != null && buildNumber < fromBuild) || (toBuild != null && buildNumber > toBuild));
+function isOutsideBuild(range: Pick<Patch, "fromBuild" | "toBuild">, buildNumber: number) {
+    return buildNumber !== -1 && ((range.fromBuild != null && buildNumber < range.fromBuild) || (range.toBuild != null && buildNumber > range.toBuild));
 }
 
 /**
