@@ -36,9 +36,9 @@ function BackupAndRestoreTab() {
                 </Card>
 
                 <Paragraph size="md" className={Margins.bottom8}>
-                    You can import and export your Vencord settings as a JSON file.
+                    You can import and export your Voxland settings as a JSON file.
                     This allows you to easily transfer your settings to another device,
-                    or recover your settings after reinstalling Vencord or Discord.
+                    or recover your settings after reinstalling Voxland or Discord.
                 </Paragraph>
 
                 <Heading tag="h4">Settings Export contains:</Heading>

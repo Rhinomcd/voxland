@@ -23,6 +23,12 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 - [Live Discord sessions](.skills/discord-session.md): run Chromium for live testing and reverse engineering
 - [Authoring plugins](.skills/authoring-plugins.md): write and manage plugins
 
+## Branches
+
+- `dev` is the default branch and the nightly channel. Open PRs against `dev`.
+- `main` is the stable channel. It only moves by a PR from `dev` to `main` that the developer merges.
+- voxland-desktop's `scripts/channel.sh` builds both channels locally from GitHub: stable from `main`, nightly from `dev`.
+
 ## Tooling
 
 - Use Vite+ (`vp`), never pnpm or npm directly. `vp install` installs, `vp run <script>` runs a package.json script.
