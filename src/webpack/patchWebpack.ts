@@ -9,6 +9,7 @@ import { traceFunctionWithResults } from "@debug/Tracer";
 import { makeLazy } from "@utils/lazy";
 import { Logger } from "@utils/Logger";
 import { interpolateIfDefined } from "@utils/misc";
+import { applyPatches, PatchDiagnostic } from "@utils/patches";
 import { Patch, PatchReplacement } from "@utils/types";
 import { WebpackRequire } from "@vencord/discord-types/webpack";
 
@@ -483,147 +484,66 @@ function runFactoryWithWrap(patchedFactory: PatchedModuleFactory, moduleId: Prop
  * @returns The patched module factory
  */
 function patchFactory(moduleId: PropertyKey, originalFactory: AnyModuleFactory): PatchedModuleFactory {
-    const originalFactoryCode = String(originalFactory);
-    const isArrowFunction = originalFactoryCode.startsWith("(");
+    const { compiled, applied, consumed, diagnostics } = applyPatches(String(originalFactory), patches, getBuildNumber(), {
+        compile(code, patchedBy) {
+            const source = `// Webpack Module ${String(moduleId)} - Patched by ${patchedBy.join(", ")}\n${code}\n//# sourceURL=file:///WebpackModule${String(moduleId)}`;
+            return { source, factory: (0, eval)(source) as AnyModuleFactory };
+        },
+        wrapReplace(patch, replacement, rewrite) {
+            const [patchedCode, totalTime] = traceFunctionWithResults(`patch by ${patch.plugin}`, rewrite)(replacement.match, replacement.replace);
 
-    // 0, prefix to turn it into an expression: 0,function(){} would be invalid syntax without the 0,
-    let patchedCode = "0," + (!isArrowFunction ? "function" : "") + originalFactoryCode.slice(originalFactoryCode.indexOf("("));
-    let patchedSource = patchedCode;
-    let patchedFactory = originalFactory;
-
-    const patchedBy = new Set<string>();
-
-    for (let i = 0; i < patches.length; i++) {
-        const patch = patches[i];
-
-        const buildNumber = getBuildNumber();
-        const shouldCheckBuildNumber = buildNumber !== -1;
-
-        if (
-            shouldCheckBuildNumber &&
-            ((patch.fromBuild != null && buildNumber < patch.fromBuild) || (patch.toBuild != null && buildNumber > patch.toBuild))
-        ) {
-            patches.splice(i--, 1);
-            continue;
-        }
-
-        const moduleMatches = typeof patch.find === "string"
-            ? originalFactoryCode.includes(patch.find)
-            : (patch.find.global && (patch.find.lastIndex = 0), patch.find.test(originalFactoryCode));
-
-        if (!moduleMatches) {
-            continue;
-        }
-
-        // Save the result from the previous patch so we can restore it in case a patch group fails.
-        const previousPatchedCode = patchedCode;
-        const previousPatchedSource = patchedSource;
-        const previousPatchedFactory = patchedFactory;
-
-        let shouldRestorePrevious = false;
-        let markedAsPatched = false;
-
-        const executePatch = traceFunctionWithResults(`patch by ${patch.plugin}`, (match: string | RegExp, replace: string) => {
-            if (typeof match !== "string" && match.global) {
-                match.lastIndex = 0;
+            if (IS_REPORTER) {
+                patchTimings.push([patch.plugin, moduleId, replacement.match, totalTime]);
             }
 
-            return patchedCode.replace(match, replace);
-        });
-
-        // We change all patch.replacement to array in PluginManager
-        for (const replacement of patch.replacement as PatchReplacement[]) {
-            if (
-                shouldCheckBuildNumber &&
-                ((replacement.fromBuild != null && buildNumber < replacement.fromBuild) || (replacement.toBuild != null && buildNumber > replacement.toBuild))
-            ) {
-                continue;
-            }
-
-            let newPatchedCode: string = "";
-            try {
-                const [patchResult, totalTime] = executePatch(replacement.match, replacement.replace as string);
-                newPatchedCode = patchResult;
-
-                if (IS_REPORTER) {
-                    patchTimings.push([patch.plugin, moduleId, replacement.match, totalTime]);
-                }
-
-                if (newPatchedCode === patchedCode) {
-                    if (!(patch.noWarn || replacement.noWarn)) {
-                        logger.warn(`Patch by ${patch.plugin} had no effect (Module id is ${String(moduleId)}): ${replacement.match}`);
-                        if (IS_DEV) {
-                            logger.debug("Function Source:\n", patchedCode);
-                        }
-                    }
-
-                    if (patch.group) {
-                        logger.warn(`Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} had no effect`);
-                        shouldRestorePrevious = true;
-                        break;
-                    }
-
-                    continue;
-                }
-
-                const pluginsList = [...patchedBy];
-                if (!patchedBy.has(patch.plugin)) {
-                    pluginsList.push(patch.plugin);
-                }
-
-                const newPatchedSource = `// Webpack Module ${String(moduleId)} - Patched by ${pluginsList.join(", ")}\n${newPatchedCode}\n//# sourceURL=file:///WebpackModule${String(moduleId)}`;
-                const newPatchedFactory = (0, eval)(newPatchedSource);
-
-                if (!patchedBy.has(patch.plugin)) {
-                    patchedBy.add(patch.plugin);
-                    markedAsPatched = true;
-                }
-
-                patchedCode = newPatchedCode;
-                patchedSource = newPatchedSource;
-                patchedFactory = newPatchedFactory;
-            } catch (err) {
-                // FIXME: Maybe fix this properly
-                const shouldSuppressError = patch.plugin === "ContextMenuAPI" && err instanceof SyntaxError && err.message.includes("arguments");
-                if (!shouldSuppressError) {
-                    logger.error(`Patch by ${patch.plugin} errored (Module id is ${String(moduleId)}): ${replacement.match}\n`, err);
-
-                    if (IS_DEV) {
-                        diffErroredPatch(newPatchedCode, patchedCode, patchedCode.match(replacement.match)!);
-                    }
-                }
-
-                if (patch.group) {
-                    logger.warn(`Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} errored`);
-                    shouldRestorePrevious = true;
-                    break;
-                }
-            }
+            return patchedCode;
         }
+    });
 
-        if (shouldRestorePrevious) {
-            patchedCode = previousPatchedCode;
-            patchedSource = previousPatchedSource;
-            patchedFactory = previousPatchedFactory;
-
-            if (markedAsPatched) {
-                patchedBy.delete(patch.plugin);
-            }
-        }
-
-        if (!patch.all) {
-            patches.splice(i--, 1);
-        }
+    for (const patch of consumed) {
+        patches.splice(patches.indexOf(patch), 1);
     }
 
+    for (const diagnostic of diagnostics) {
+        logPatchDiagnostic(moduleId, diagnostic);
+    }
+
+    const patchedFactory = compiled?.factory ?? originalFactory;
     patchedFactory[SYM_ORIGINAL_FACTORY] = originalFactory;
 
-    if (IS_DEV && patchedFactory !== originalFactory) {
-        originalFactory[SYM_PATCHED_SOURCE] = patchedSource;
-        originalFactory[SYM_PATCHED_BY] = patchedBy;
+    if (IS_DEV && compiled) {
+        originalFactory[SYM_PATCHED_SOURCE] = compiled.source;
+        originalFactory[SYM_PATCHED_BY] = new Set(applied.map(p => p.plugin));
     }
 
     return patchedFactory as PatchedModuleFactory;
+}
+
+function logPatchDiagnostic(moduleId: PropertyKey, diagnostic: PatchDiagnostic) {
+    const { patch, replacement } = diagnostic;
+
+    switch (diagnostic.type) {
+        case "noEffect":
+            logger.warn(`Patch by ${patch.plugin} had no effect (Module id is ${String(moduleId)}): ${replacement.match}`);
+            if (IS_DEV) {
+                logger.debug("Function Source:\n", diagnostic.code);
+            }
+            break;
+        case "groupUndone":
+            logger.warn(`Undoing patch group ${patch.find} by ${patch.plugin} because replacement ${replacement.match} ${diagnostic.cause === "error" ? "errored" : "had no effect"}`);
+            break;
+        case "error": {
+            const { error, code, newCode } = diagnostic;
+            const shouldSuppressError = patch.plugin === "ContextMenuAPI" && error instanceof SyntaxError && error.message.includes("arguments");
+            if (shouldSuppressError) break;
+
+            logger.error(`Patch by ${patch.plugin} errored (Module id is ${String(moduleId)}): ${replacement.match}\n`, error);
+            if (IS_DEV) {
+                diffErroredPatch(newCode, code, code.match(replacement.match)!);
+            }
+            break;
+        }
+    }
 }
 
 function diffErroredPatch(code: string, lastCode: string, match: RegExpMatchArray) {
