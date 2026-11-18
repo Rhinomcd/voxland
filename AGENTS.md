@@ -33,6 +33,7 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 
 - Use Vite+ (`vp`), never pnpm or npm directly. `vp install` installs, `vp run <script>` runs a package.json script.
 - Verify changes with `vp run build --dev` and `vp run test`, or a narrower package.json script. Always build with `--dev`.
+- `vp run test:ts` only typechecks; `vp run lint` only lints.
 
 ## Unit tests
 
