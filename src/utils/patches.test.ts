@@ -121,6 +121,19 @@ describe("applyPatches", () => {
         expect(result.diagnostics).toEqual([{ type: "error", patch: p, replacement: throws, error: new Error("boom"), code: result.code, newCode: "" }]);
     });
 
+    it("reads getter-backed match and replace once per replacement, inside its error handling", () => {
+        let replaceReads = 0;
+        const replaceGetter = { match: '"hello"', get replace() { return ++replaceReads === 1 ? '"first"' : '"second"'; } } as PatchReplacement;
+        let matchReads = 0;
+        const matchGetter = { get match() { if (++matchReads === 1) throw new Error("unavailable"); return '"world"'; }, replace: '"there"' } as PatchReplacement;
+        const p = patch({ replacement: [replaceGetter, matchGetter, { match: '"world"', replace: '"later"' }] });
+
+        const result = applyPatches(source, [p], -1);
+
+        expect(result.code).toBe('0,function(e,t,n){let r="first",o="later";return r+o}');
+        expect(result.diagnostics).toMatchObject([{ type: "error", replacement: matchGetter, error: new Error("unavailable") }]);
+    });
+
     it("passes compile the plugins that patched the module so far", () => {
         const calls: string[][] = [];
         const patches = [

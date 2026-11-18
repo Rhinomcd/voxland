@@ -489,8 +489,8 @@ function patchFactory(moduleId: PropertyKey, originalFactory: AnyModuleFactory):
             const source = `// Webpack Module ${String(moduleId)} - Patched by ${patchedBy.join(", ")}\n${code}\n//# sourceURL=file:///WebpackModule${String(moduleId)}`;
             return { source, factory: (0, eval)(source) as AnyModuleFactory };
         },
-        wrapReplace(patch, replacement, replace) {
-            const [patchedCode, totalTime] = traceFunctionWithResults(`patch by ${patch.plugin}`, (match: PatchReplacement["match"], replaceWith: PatchReplacement["replace"]) => replace())(replacement.match, replacement.replace);
+        wrapReplace(patch, replacement, rewrite) {
+            const [patchedCode, totalTime] = traceFunctionWithResults(`patch by ${patch.plugin}`, rewrite)(replacement.match, replacement.replace);
 
             if (IS_REPORTER) {
                 patchTimings.push([patch.plugin, moduleId, replacement.match, totalTime]);

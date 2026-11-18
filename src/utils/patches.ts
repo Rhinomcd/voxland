@@ -115,8 +115,8 @@ export type PatchDiagnostic =
 export interface ApplyPatchesOptions<T> {
     /** Turns patched code into what the caller runs, such as an evaluated factory. A throw rejects the replacement like a failed replace. */
     compile?(code: string, patchedBy: string[]): T;
-    /** Wraps each replacement's string rewrite, for example to time it. */
-    wrapReplace?(patch: Patch, replacement: PatchReplacement, replace: () => string): string;
+    /** Runs each replacement's rewrite in place of calling `rewrite(replacement.match, replacement.replace)`, for example to time it. */
+    wrapReplace?(patch: Patch, replacement: PatchReplacement, rewrite: (match: PatchReplacement["match"], replace: PatchReplacement["replace"]) => string): string;
 }
 
 export interface ApplyPatchesResult<T> {
@@ -174,22 +174,21 @@ export function applyPatches<T = undefined>(
         let patchApplied = false;
         let undoGroup = false;
 
+        const rewrite = (match: PatchReplacement["match"], replace: PatchReplacement["replace"]) => {
+            if (typeof match !== "string" && match.global) {
+                match.lastIndex = 0;
+            }
+
+            return code.replace(match, replace as string);
+        };
+
         // PluginManager normalizes patch.replacement to an array
         for (const replacement of patch.replacement as PatchReplacement[]) {
             if (isOutsideBuild(replacement, buildNumber)) continue;
 
-            const { match } = replacement;
-            const replace = () => {
-                if (typeof match !== "string" && match.global) {
-                    match.lastIndex = 0;
-                }
-
-                return code.replace(match, replacement.replace as string);
-            };
-
             let newCode = "";
             try {
-                newCode = wrapReplace ? wrapReplace(patch, replacement, replace) : replace();
+                newCode = wrapReplace ? wrapReplace(patch, replacement, rewrite) : rewrite(replacement.match, replacement.replace);
 
                 if (newCode === code) {
                     if (!(patch.noWarn || replacement.noWarn)) {
