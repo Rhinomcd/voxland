@@ -115,7 +115,7 @@ export type PatchDiagnostic =
 export interface ApplyPatchesOptions<T> {
     /** Turns patched code into what the caller runs, such as an evaluated factory. A throw rejects the replacement like a failed replace. */
     compile?(code: string, patchedBy: string[]): T;
-    /** Runs each replacement's rewrite in place of calling `rewrite(replacement.match, replacement.replace)`, for example to time it. */
+    /** Must return `rewrite(replacement.match, replacement.replace)`. Lets the caller time each replacement. */
     wrapReplace?(patch: Patch, replacement: PatchReplacement, rewrite: (match: PatchReplacement["match"], replace: PatchReplacement["replace"]) => string): string;
 }
 
@@ -137,7 +137,6 @@ function isOutsideBuild(range: Pick<Patch, "fromBuild" | "toBuild">, buildNumber
 
 /**
  * Applies patches to a webpack module factory's source without side effects beyond the patches' own replace functions.
- * Patches must be prepared with {@link preparePatch}.
  *
  * @param source The module factory source, as returned by String(factory)
  * @param buildNumber The Discord build number, or -1 to skip build range checks
@@ -182,8 +181,7 @@ export function applyPatches<T = undefined>(
             return code.replace(match, replace as string);
         };
 
-        // PluginManager normalizes patch.replacement to an array
-        for (const replacement of patch.replacement as PatchReplacement[]) {
+        for (const replacement of [patch.replacement].flat()) {
             if (isOutsideBuild(replacement, buildNumber)) continue;
 
             let newCode = "";

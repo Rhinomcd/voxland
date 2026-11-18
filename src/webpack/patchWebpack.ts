@@ -534,7 +534,6 @@ function logPatchDiagnostic(moduleId: PropertyKey, diagnostic: PatchDiagnostic) 
             break;
         case "error": {
             const { error, code, newCode } = diagnostic;
-            // FIXME: Maybe fix this properly
             const shouldSuppressError = patch.plugin === "ContextMenuAPI" && error instanceof SyntaxError && error.message.includes("arguments");
             if (shouldSuppressError) break;
 

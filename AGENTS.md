@@ -33,7 +33,7 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 - `vp test` runs the Vitest unit tests once; `vp test watch` reruns them on change. `vp run test`, which CI runs, includes them.
 - Put a test next to the code it covers as `src/**/<name>.test.ts`, import from `vite-plus/test`, and use the `@utils/...` path aliases.
 - Unit-test pure code only. Tests run in Node with no Discord, webpack, or build-time globals such as `IS_DEV`.
-- To check a patch without Discord, feed `applyPatches` from `@utils/patches` an inline module source. See `src/utils/patches.test.ts`.
+- To check a patch without Discord, run it through `preparePatch` and then `applyPatches` (both in `@utils/patches`) against an inline module source. See `src/utils/patches.test.ts`.
 
 ## Style
 
