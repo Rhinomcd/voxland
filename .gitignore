@@ -1,5 +1,6 @@
 dist
 node_modules
+patch-fixtures
 
 *.exe
 vencord_installer

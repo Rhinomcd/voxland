@@ -124,6 +124,8 @@ export interface ApplyPatchesResult<T> {
     code: string;
     /** The compile result for {@link code}, or undefined if no replacement was kept */
     compiled: T | undefined;
+    /** Patches whose find matched the source, in application order */
+    matched: Patch[];
     /** Patches with at least one kept replacement, in application order */
     applied: Patch[];
     /** Patches to remove from the patch list: matched patches without `all`, and patches outside the build range */
@@ -131,7 +133,7 @@ export interface ApplyPatchesResult<T> {
     diagnostics: PatchDiagnostic[];
 }
 
-function isOutsideBuild(range: Pick<Patch, "fromBuild" | "toBuild">, buildNumber: number) {
+export function isOutsideBuild(range: Pick<Patch, "fromBuild" | "toBuild">, buildNumber: number) {
     return buildNumber !== -1 && ((range.fromBuild != null && buildNumber < range.fromBuild) || (range.toBuild != null && buildNumber > range.toBuild));
 }
 
@@ -152,6 +154,7 @@ export function applyPatches<T = undefined>(
     let code = "0," + (isArrowFunction ? "" : "function") + source.slice(source.indexOf("("));
     let compiled: T | undefined;
 
+    const matched: Patch[] = [];
     const applied: Patch[] = [];
     const consumed: Patch[] = [];
     const diagnostics: PatchDiagnostic[] = [];
@@ -167,6 +170,7 @@ export function applyPatches<T = undefined>(
             : (patch.find.global && (patch.find.lastIndex = 0), patch.find.test(source));
 
         if (!moduleMatches) continue;
+        matched.push(patch);
 
         const previousCode = code;
         const previousCompiled = compiled;
@@ -237,5 +241,5 @@ export function applyPatches<T = undefined>(
         }
     }
 
-    return { code, compiled, applied, consumed, diagnostics };
+    return { code, compiled, matched, applied, consumed, diagnostics };
 }

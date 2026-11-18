@@ -6,7 +6,7 @@
 
 import { Logger } from "@utils/Logger";
 import * as Webpack from "@webpack";
-import { getBuildNumber, patches } from "@webpack/patcher";
+import { getBuildNumber, matchedModuleSources, patches } from "@webpack/patcher";
 
 import { loadLazyChunks } from "./loadLazyChunks";
 
@@ -39,6 +39,11 @@ async function runReporter() {
             try {
                 Webpack.wreq(moduleId);
             } catch { }
+        }
+
+        if (!IS_WEB) {
+            const file = await VencordNative.reporter.savePatchFixtures(getBuildNumber(), matchedModuleSources);
+            ReporterLogger.log(`Saved ${matchedModuleSources.length} patch fixtures to ${file}`);
         }
 
         if (IS_REPORTER && IS_WEB && !IS_VESKTOP) {

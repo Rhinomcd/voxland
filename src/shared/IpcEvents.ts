@@ -55,4 +55,6 @@ export const enum IpcEvents {
     PRELOAD_GET_RENDERER_JS = "VencordPreloadGetRendererJs",
 
     SUPPORTS_WINDOWS_MATERIAL = "VencordSupportsWindowsMaterial",
+
+    REPORTER_SAVE_PATCH_FIXTURES = "VencordReporterSavePatchFixtures",
 }

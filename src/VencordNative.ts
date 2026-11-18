@@ -100,5 +100,9 @@ export default {
             invoke<CspRequestResult>(IpcEvents.CSP_REQUEST_ADD_OVERRIDE, url, directives, callerName),
     },
 
+    reporter: {
+        savePatchFixtures: (buildNumber: number, modules: Array<[moduleId: string, source: string]>) => invoke<string>(IpcEvents.REPORTER_SAVE_PATCH_FIXTURES, buildNumber, modules),
+    },
+
     pluginHelpers: PluginHelpers
 };

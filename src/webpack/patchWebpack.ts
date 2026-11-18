@@ -25,6 +25,8 @@ export const SYM_PATCHED_SOURCE = Symbol("WebpackPatcher.patchedSource");
 export const SYM_PATCHED_BY = Symbol("WebpackPatcher.patchedBy");
 export const allWebpackInstances = new Set<AnyWebpackRequire>();
 
+/** Reporter only: the original source of every module a patch's find matched, in the order they were patched */
+export const matchedModuleSources = [] as Array<[moduleId: string, source: string]>;
 export const patchTimings = [] as Array<[plugin: string, moduleId: PropertyKey, match: PatchReplacement["match"], totalTime: number]>;
 
 export const getBuildNumber = makeLazy(() => {
@@ -484,7 +486,8 @@ function runFactoryWithWrap(patchedFactory: PatchedModuleFactory, moduleId: Prop
  * @returns The patched module factory
  */
 function patchFactory(moduleId: PropertyKey, originalFactory: AnyModuleFactory): PatchedModuleFactory {
-    const { compiled, applied, consumed, diagnostics } = applyPatches(String(originalFactory), patches, getBuildNumber(), {
+    const originalSource = String(originalFactory);
+    const { compiled, matched, applied, consumed, diagnostics } = applyPatches(originalSource, patches, getBuildNumber(), {
         compile(code, patchedBy) {
             const source = `// Webpack Module ${String(moduleId)} - Patched by ${patchedBy.join(", ")}\n${code}\n//# sourceURL=file:///WebpackModule${String(moduleId)}`;
             return { source, factory: (0, eval)(source) as AnyModuleFactory };
@@ -499,6 +502,10 @@ function patchFactory(moduleId: PropertyKey, originalFactory: AnyModuleFactory):
             return patchedCode;
         }
     });
+
+    if (IS_REPORTER && matched.length) {
+        matchedModuleSources.push([String(moduleId), originalSource]);
+    }
 
     for (const patch of consumed) {
         patches.splice(patches.indexOf(patch), 1);
@@ -519,6 +526,10 @@ function patchFactory(moduleId: PropertyKey, originalFactory: AnyModuleFactory):
     return patchedFactory as PatchedModuleFactory;
 }
 
+export function isSuppressedPatchError(patch: Patch, error: unknown) {
+    return patch.plugin === "ContextMenuAPI" && error instanceof SyntaxError && error.message.includes("arguments");
+}
+
 function logPatchDiagnostic(moduleId: PropertyKey, diagnostic: PatchDiagnostic) {
     const { patch, replacement } = diagnostic;
 
@@ -534,8 +545,7 @@ function logPatchDiagnostic(moduleId: PropertyKey, diagnostic: PatchDiagnostic) 
             break;
         case "error": {
             const { error, code, newCode } = diagnostic;
-            const shouldSuppressError = patch.plugin === "ContextMenuAPI" && error instanceof SyntaxError && error.message.includes("arguments");
-            if (shouldSuppressError) break;
+            if (isSuppressedPatchError(patch, error)) break;
 
             logger.error(`Patch by ${patch.plugin} errored (Module id is ${String(moduleId)}): ${replacement.match}\n`, error);
             if (IS_DEV) {

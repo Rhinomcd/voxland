@@ -55,6 +55,10 @@ window.VencordNative = {
         openFolder: async () => Promise.reject("themes:openFolder is not supported on web"),
     },
 
+    reporter: {
+        savePatchFixtures: async () => Promise.reject("reporter:savePatchFixtures is not supported on web"),
+    },
+
     native: {
         getVersions: () => ({}),
         supportsWindowsMaterial: () => false,
