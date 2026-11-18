@@ -24,7 +24,7 @@ import { debounce } from "@shared/debounce";
 import { IpcEvents } from "@shared/IpcEvents";
 import { BrowserWindow, ipcMain, nativeTheme, shell, systemPreferences } from "electron";
 import { FSWatcher, mkdirSync, readFileSync, watch, writeFileSync } from "fs";
-import { open, readdir, readFile } from "fs/promises";
+import { mkdir, open, readdir, readFile, writeFile } from "fs/promises";
 import { release } from "os";
 import { join } from "path";
 
@@ -102,6 +102,18 @@ ipcMain.handle(IpcEvents.GET_THEME_SYSTEM_VALUES, () => {
         "os-accent-color": accentColor
     };
 });
+
+if (IS_REPORTER) {
+    ipcMain.handle(IpcEvents.REPORTER_SAVE_PATCH_FIXTURES, async (_, buildNumber: number, modules: Array<[moduleId: string, source: string]>) => {
+        if (!Number.isInteger(buildNumber)) throw new Error(`Invalid build number ${buildNumber}`);
+
+        const dir = join(__dirname, "..", "patch-fixtures");
+        const file = join(dir, `${buildNumber}.json`);
+        await mkdir(dir, { recursive: true });
+        await writeFile(file, JSON.stringify(modules));
+        return file;
+    });
+}
 
 ipcMain.handle(IpcEvents.OPEN_THEMES_FOLDER, () => shell.openPath(THEMES_DIR));
 ipcMain.handle(IpcEvents.OPEN_SETTINGS_FOLDER, () => shell.openPath(SETTINGS_DIR));

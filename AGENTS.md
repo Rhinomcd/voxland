@@ -35,6 +35,18 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 - Unit-test pure code only. Tests run in Node with no Discord, webpack, or build-time globals such as `IS_DEV`.
 - To check a patch without Discord, run it through `preparePatch` and then `applyPatches` (both in `@utils/patches`) against an inline module source. See `src/utils/patches.test.ts`.
 
+## Offline patch check
+
+`vp run checkPatches` runs every plugin's patches, as the reporter registers them, through `applyPatches` against saved Discord modules, without Discord. It prints `FAIL <Plugin>: …` for each patch whose find matches no module (including `all` patches, which the reporter doesn't flag), whose replacement has no effect, or whose result doesn't compile, and exits non-zero. Patches with `fromBuild`/`toBuild` print the module they matched, or that the saved build is outside their range.
+
+The saved modules are Discord's code, so they stay out of git in `patch-fixtures/`. Refresh them when Discord updates:
+
+1. `vp run buildReporterDesktop`, a non-dev build with the reporter.
+2. Start voxland-desktop with `vencordDir` set to this repo's `dist`. The reporter loads every chunk and logs `[Reporter] Saved N patch fixtures to …` before `Finished test`.
+3. `vp run build --dev` to go back to a dev build.
+
+A run writes `patch-fixtures/<build number>.json`: an array of `[moduleId, source]` pairs, the original source of each module a patch's find matched, in the order Discord loaded them. The check applies patches in that order, as the runtime does, because a patch is used up by the first module its find matches. Captures from other builds, such as canary, sit beside it, and the check runs against each.
+
 ## Style
 
 - Write clean, simple code:

@@ -50,6 +50,7 @@ describe("applyPatches", () => {
         const result = applyPatches(source, [p, regexFind], -1);
 
         expect(result.code).toBe(wrapped);
+        expect(result.matched).toEqual([]);
         expect(result.applied).toEqual([]);
         expect(result.consumed).toEqual([]);
         expect(result.diagnostics).toEqual([]);
@@ -92,6 +93,7 @@ describe("applyPatches", () => {
 
         expect(result.code).toBe('0,function(e,t,n){let r="hello",o="there";return r+o}');
         expect(String(result.compiled)).toBe(result.code.slice(2));
+        expect(result.matched).toEqual([before, group]);
         expect(result.applied).toEqual([before]);
         expect(result.consumed).toEqual([before, group]);
         expect(result.diagnostics).toEqual([{ type: "groupUndone", patch: group, replacement: missing, cause: "noEffect" }]);

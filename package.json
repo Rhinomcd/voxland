@@ -20,6 +20,7 @@
         "buildWebStandalone": "vp run buildWeb --standalone",
         "buildReporter": "vp run buildWebStandalone --reporter --skip-extension",
         "buildReporterDesktop": "vp run build --reporter",
+        "checkPatches": "node --require=./scripts/suppressExperimentalWarnings.js scripts/checkPatches.mjs",
         "watch": "vp run build --watch",
         "dev": "vp run watch",
         "watchWeb": "vp run buildWeb --watch",
