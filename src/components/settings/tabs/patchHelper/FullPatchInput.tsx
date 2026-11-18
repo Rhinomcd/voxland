@@ -6,17 +6,19 @@
 
 import { Paragraph } from "@components/Paragraph";
 import { Margins } from "@utils/margins";
-import { Patch, ReplaceFn } from "@utils/types";
+import { Patch } from "@utils/types";
 import { TextArea, useEffect, useRef, useState } from "@webpack/common";
+
+import { makeReplacementDraft, ReplacementDraft } from "./PatchPreview";
 
 export interface FullPatchInputProps {
     setFind(v: string): void;
     setParsedFind(v: string | RegExp): void;
-    setMatch(v: string): void;
-    setReplacement(v: string | ReplaceFn): void;
+    setReplacements(v: ReplacementDraft[]): void;
+    setGroup(v: boolean): void;
 }
 
-export function FullPatchInput({ setFind, setParsedFind, setMatch, setReplacement }: FullPatchInputProps) {
+export function FullPatchInput({ setFind, setParsedFind, setReplacements, setGroup }: FullPatchInputProps) {
     const [patch, setPatch] = useState<string>("");
     const [error, setError] = useState<string>("");
 
@@ -28,31 +30,31 @@ export function FullPatchInput({ setFind, setParsedFind, setMatch, setReplacemen
 
             setFind("");
             setParsedFind("");
-            setMatch("");
-            setReplacement("");
+            setReplacements([makeReplacementDraft()]);
+            setGroup(false);
             return;
         }
 
         try {
-            let { find, replacement } = (0, eval)(`([${patch}][0])`) as Patch;
+            const { find, replacement, group } = (0, eval)(`([${patch}][0])`) as Patch;
 
             if (!find) throw new Error("No 'find' field");
             if (!replacement) throw new Error("No 'replacement' field");
 
-            if (replacement instanceof Array) {
-                if (replacement.length === 0) throw new Error("Invalid replacement");
+            const replacements = [replacement].flat();
+            if (replacements.length === 0) throw new Error("Invalid replacement");
 
-                // Only test the first replacement
-                replacement = replacement[0];
-            }
+            setReplacements(replacements.map(({ match, replace }) => {
+                if (!match) throw new Error("No 'replacement.match' field");
+                if (replace == null) throw new Error("No 'replacement.replace' field");
 
-            if (!replacement.match) throw new Error("No 'replacement.match' field");
-            if (replacement.replace == null) throw new Error("No 'replacement.replace' field");
-
+                return match instanceof RegExp
+                    ? makeReplacementDraft({ match: match.source, flags: match.flags, replace })
+                    : makeReplacementDraft({ match, flags: "", replace });
+            }));
             setFind(find instanceof RegExp ? `/${find.source}/` : find);
             setParsedFind(find);
-            setMatch(replacement.match instanceof RegExp ? replacement.match.source : replacement.match);
-            setReplacement(replacement.replace);
+            setGroup(!!group);
             setError("");
         } catch (e) {
             setError((e as Error).message);
