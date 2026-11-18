@@ -30,7 +30,7 @@ import { disableStyle, enableStyle } from "@api/Styles";
 import { traceFunction } from "@debug/Tracer";
 import { Logger } from "@utils/Logger";
 import { onlyOnce } from "@utils/onlyOnce";
-import { canonicalizeFind, canonicalizeReplacement } from "@utils/patches";
+import { preparePatch } from "@utils/patches";
 import { DefinedSettings, Patch, Plugin, PluginDef, PluginSettingDef, ReporterTestable, StartAt } from "@utils/types";
 import { FluxEvents } from "@vencord/discord-types";
 import { FluxDispatcher } from "@webpack/common";
@@ -84,24 +84,13 @@ export function addPatch(newPatch: Omit<Patch, "plugin">, pluginName: string, pl
     if (IS_REPORTER) {
         delete patch.predicate;
         delete patch.group;
-    }
 
-    if (patch.predicate && !patch.predicate()) return;
-
-    canonicalizeFind(patch);
-    if (!Array.isArray(patch.replacement)) {
-        patch.replacement = [patch.replacement];
-    }
-
-    for (const replacement of patch.replacement) {
-        canonicalizeReplacement(replacement, pluginPath);
-
-        if (IS_REPORTER) {
+        for (const replacement of [patch.replacement].flat()) {
             delete replacement.predicate;
         }
     }
 
-    patch.replacement = patch.replacement.filter(({ predicate }) => !predicate || predicate());
+    if (!preparePatch(patch, pluginPath)) return;
 
     patches.push(patch);
 }

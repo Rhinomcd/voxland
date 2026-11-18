@@ -28,6 +28,13 @@ Voxland exists so people can build a client mod with coding agents. Agents are w
 - Use Vite+ (`vp`), never pnpm or npm directly. `vp install` installs, `vp run <script>` runs a package.json script.
 - Verify changes with `vp run build --dev` and `vp run test`, or a narrower package.json script. Always build with `--dev`.
 
+## Unit tests
+
+- `vp test` runs the Vitest unit tests once; `vp test watch` reruns them on change. `vp run test`, which CI runs, includes them.
+- Put a test next to the code it covers as `src/**/<name>.test.ts`, import from `vite-plus/test`, and use the `@utils/...` path aliases.
+- Unit-test pure code only. Tests run in Node with no Discord, webpack, or build-time globals such as `IS_DEV`.
+- To check a patch without Discord, feed `applyPatches` from `@utils/patches` an inline module source. See `src/utils/patches.test.ts`.
+
 ## Style
 
 - Write clean, simple code:
