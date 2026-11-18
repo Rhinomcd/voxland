@@ -17,14 +17,6 @@
 */
 
 export const REACT_GLOBAL = "Vencord.Webpack.Common.React";
-export const VENBOT_USER_ID = "1017176847865352332";
-export const VENCORD_GUILD_ID = "1015060230222131221";
-export const DONOR_ROLE_ID = "1042507929485586532";
-export const CONTRIB_ROLE_ID = "1026534353167208489";
-export const REGULAR_ROLE_ID = "1026504932959977532";
-export const SUPPORT_CHANNEL_ID = "1026515880080842772";
-export const SUPPORT_CATEGORY_ID = "1108135649699180705";
-export const KNOWN_ISSUES_CHANNEL_ID = "1257025907625951423";
 
 const platform = navigator.platform.toLowerCase();
 export const IS_WINDOWS = platform.startsWith("win");
@@ -37,14 +29,12 @@ export const IS_MOBILE = navigator.userAgent.includes("Mobi");
 export interface Dev {
     name: string;
     id: bigint;
-    badge?: boolean;
 }
 
 /**
  * If you made a plugin or substantial contribution, add yourself here.
- * This object is used for the plugin author list, as well as to add a contributor badge to your profile.
+ * This object is used for the plugin author list.
  * If you wish to stay fully anonymous, feel free to set ID to 0n.
- * If you are fine with attribution but don't want the badge, add badge: false
  */
 export const Devs = /* #__PURE__*/ Object.freeze({
     Ven: {
@@ -57,8 +47,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     },
     Arjix: {
         name: "ArjixWasTaken",
-        id: 674710789138939916n,
-        badge: false
+        id: 674710789138939916n
     },
     Cyn: {
         name: "Cynosphere",
@@ -222,8 +211,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     },
     nick: {
         name: "nick",
-        id: 347884694408265729n,
-        badge: false
+        id: 347884694408265729n
     },
     whqwert: {
         name: "whqwert",
@@ -615,8 +603,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     },
     koish1: {
         name: "koish1",
-        id: 291089948709486593n,
-        badge: false,
+        id: 291089948709486593n
     },
     thororen: {
         name: "thororen",

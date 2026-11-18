@@ -15,7 +15,6 @@ export * from "./ErrorCard";
 export * from "./Flex";
 export * from "./FormSwitch";
 export * from "./Grid";
-export * from "./Heart";
 export * from "./Icons";
 export * from "./LegacyHeading";
 export * from "./Link";

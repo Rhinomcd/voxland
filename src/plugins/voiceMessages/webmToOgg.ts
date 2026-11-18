@@ -124,7 +124,7 @@ function createOggPage(packets: Uint8Array[], granulePosition: number, serial: n
 }
 
 function createOpusTags() {
-    const vendor = new TextEncoder().encode("Vencord");
+    const vendor = new TextEncoder().encode("Voxland");
     const tags = new Uint8Array(8 + 4 + vendor.length + 4);
 
     tags.set(new TextEncoder().encode("OpusTags"));

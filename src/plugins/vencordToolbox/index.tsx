@@ -18,7 +18,7 @@
 
 import "./styles.css";
 
-import { definePluginSettings } from "@api/Settings";
+import { definePluginSettings, migratePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
@@ -29,6 +29,8 @@ import type { PropsWithChildren } from "react";
 import { renderPopout } from "./menu";
 
 const HeaderBarIcon = findComponentByCodeLazy(".HEADER_BAR_BADGE_BOTTOM,", 'position:"bottom"');
+
+migratePluginSettings("VoxlandToolbox", "VencordToolbox");
 
 export const settings = definePluginSettings({
     showPluginMenu: {
@@ -68,7 +70,7 @@ function VencordPopoutButton() {
                     ref={buttonRef}
                     className="vc-toolbox-btn"
                     onClick={() => setShow(v => !v)}
-                    tooltip={isShown ? null : "Vencord Toolbox"}
+                    tooltip={isShown ? null : "Voxland Toolbox"}
                     icon={() => <Icon isShown={isShown} />}
                     selected={isShown}
                 />
@@ -78,8 +80,8 @@ function VencordPopoutButton() {
 }
 
 export default definePlugin({
-    name: "VencordToolbox",
-    description: "Adds a button to the titlebar that houses Vencord quick actions",
+    name: "VoxlandToolbox",
+    description: "Adds a button to the titlebar that houses Voxland quick actions",
     tags: ["Utility", "Developers"],
     authors: [Devs.Ven, Devs.AutumnVN],
 
