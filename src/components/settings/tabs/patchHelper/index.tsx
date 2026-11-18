@@ -20,20 +20,19 @@ import { Button } from "@components/Button";
 import { CodeBlock } from "@components/CodeBlock";
 import { Divider } from "@components/Divider";
 import { Flex } from "@components/Flex";
+import { FormSwitch } from "@components/FormSwitch";
 import { Heading } from "@components/Heading";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
 import { debounce } from "@shared/debounce";
 import { copyWithToast } from "@utils/discord";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
-import { stripIndent } from "@utils/text";
-import { ReplaceFn } from "@utils/types";
 import { search } from "@webpack";
 import { React, TextInput, useMemo, useState } from "@webpack/common";
 
 import { FullPatchInput } from "./FullPatchInput";
-import { PatchPreview } from "./PatchPreview";
-import { ReplacementInput } from "./ReplacementInput";
+import { emptyReplacement, PatchPreview, ReplacementDraft } from "./PatchPreview";
+import { CheatSheet, ReplacementInput } from "./ReplacementInput";
 
 const findCandidates = debounce(function ({ find, setModule, setError }) {
     const candidates = search(find);
@@ -48,33 +47,50 @@ const findCandidates = debounce(function ({ find, setModule, setError }) {
         setModule([keys[0], candidates[keys[0]]]);
 });
 
+function regexLiteral({ match, flags }: ReplacementDraft) {
+    return `/${match.replace(/(?<!\\)\//g, "\\/")}/${flags}`;
+}
+
+function matchError(match: string, flags: string) {
+    try {
+        new RegExp(match, flags);
+    } catch (e) {
+        return (e as Error).message;
+    }
+}
+
+function indent(code: string, depth: number) {
+    return code.replaceAll("\n", "\n" + "    ".repeat(depth));
+}
+
 function PatchHelper() {
     const [find, setFind] = useState("");
-    const [match, setMatch] = useState("");
-    const [replacement, setReplacement] = useState<string | ReplaceFn>("");
+    const [replacements, setReplacements] = useState<ReplacementDraft[]>([emptyReplacement]);
+    const [group, setGroup] = useState(false);
 
     const [parsedFind, setParsedFind] = useState<string | RegExp>("");
 
     const [findError, setFindError] = useState<string>();
-    const [matchError, setMatchError] = useState<string>();
-    const [replacementError, setReplacementError] = useState<string>();
 
     const [module, setModule] = useState<[number, Function]>();
 
     const code = useMemo(() => {
         const find = parsedFind instanceof RegExp ? parsedFind.toString() : JSON.stringify(parsedFind);
-        const replace = typeof replacement === "function" ? replacement.toString() : JSON.stringify(replacement);
+        const replacementCode = replacements.map(r => {
+            const replace = typeof r.replace === "function" ? r.replace.toString() : JSON.stringify(r.replace);
+            return `{\n    match: ${regexLiteral(r)},\n    replace: ${replace}\n}`;
+        });
 
-        return stripIndent`
-            {
-                find: ${find},
-                replacement: {
-                    match: /${match.replace(/(?<!\\)\//g, "\\/")}/,
-                    replace: ${replace}
-                }
-            }
-        `;
-    }, [parsedFind, match, replacement]);
+        return [
+            "{",
+            `    find: ${find},`,
+            ...(group ? ["    group: true,"] : []),
+            replacementCode.length === 1
+                ? `    replacement: ${indent(replacementCode[0], 1)}`
+                : `    replacement: [\n${replacementCode.map(c => "        " + indent(c, 2)).join(",\n")}\n    ]`,
+            "}"
+        ].join("\n");
+    }, [parsedFind, replacements, group]);
 
     function onFindChange(v: string) {
         setFind(v);
@@ -94,15 +110,8 @@ function PatchHelper() {
         }
     }
 
-    function onMatchChange(v: string) {
-        setMatch(v);
-
-        try {
-            new RegExp(v);
-            setMatchError(void 0);
-        } catch (e: any) {
-            setMatchError((e as Error).message);
-        }
+    function updateReplacement(index: number, change: Partial<ReplacementDraft>) {
+        setReplacements(rs => rs.with(index, { ...rs[index], ...change }));
     }
 
     return (
@@ -111,8 +120,8 @@ function PatchHelper() {
             <FullPatchInput
                 setFind={onFindChange}
                 setParsedFind={setParsedFind}
-                setMatch={onMatchChange}
-                setReplacement={setReplacement}
+                setReplacements={setReplacements}
+                setGroup={setGroup}
             />
 
             <Heading className={classes(Margins.top8, Margins.bottom8)}>Find</Heading>
@@ -123,32 +132,56 @@ function PatchHelper() {
                 error={findError}
             />
 
-            <Heading className={classes(Margins.top8, Margins.bottom8)}>Match</Heading>
-            <TextInput
-                type="text"
-                value={match}
-                onChange={onMatchChange}
-                error={matchError}
-            />
+            {replacements.map((r, i) => (
+                <React.Fragment key={i}>
+                    {i > 0 && <Divider className={Margins.top16} />}
+                    <Heading className={classes(Margins.top8, Margins.bottom8)}>Match{r.flags && ` (flags: ${r.flags})`}</Heading>
+                    <TextInput
+                        type="text"
+                        value={r.match}
+                        onChange={match => updateReplacement(i, { match })}
+                        error={matchError(r.match, r.flags)}
+                    />
 
-            <div className={Margins.top8} />
-            <ReplacementInput
-                replacement={replacement}
-                setReplacement={setReplacement}
-                replacementError={replacementError}
+                    <div className={Margins.top8} />
+                    <ReplacementInput
+                        replacement={r.replace}
+                        setReplacement={replace => updateReplacement(i, { replace })}
+                    />
+                    {replacements.length > 1 && (
+                        <Button className={Margins.top8} variant="dangerSecondary" size="small" onClick={() => setReplacements(rs => rs.toSpliced(i, 1))}>
+                            Remove replacement
+                        </Button>
+                    )}
+                </React.Fragment>
+            ))}
+
+            <Flex className={Margins.top16}>
+                <Button variant="secondary" onClick={() => setReplacements(rs => [...rs, emptyReplacement])}>
+                    Add replacement
+                </Button>
+            </Flex>
+            <FormSwitch
+                className={Margins.top16}
+                value={group}
+                onChange={setGroup}
+                title="Group"
+                description="Only apply the replacements if all of them succeed"
+                hideBorder
             />
+            <CheatSheet />
 
             <Divider />
             {module && (
                 <PatchPreview
                     module={module}
-                    match={match}
-                    replacement={replacement}
-                    setReplacementError={setReplacementError}
+                    find={parsedFind}
+                    group={group}
+                    replacements={replacements}
                 />
             )}
 
-            {!!(find && match && replacement) && (
+            {!!(find && replacements.every(r => r.match && r.replace)) && (
                 <>
                     <Heading className={classes(Margins.top20, Margins.bottom8)}>Code</Heading>
                     <CodeBlock lang="js" content={code} />

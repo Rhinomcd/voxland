@@ -9,6 +9,7 @@ import { Heading } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
+import { ReplaceFn } from "@utils/types";
 import { Parser, TextInput, useEffect, useState } from "@webpack/common";
 
 const RegexGuide = {
@@ -21,8 +22,26 @@ const RegexGuide = {
     "$self": "Insert the plugin instance",
 } as const;
 
-export function ReplacementInput({ replacement, setReplacement, replacementError }) {
-    const [isFunc, setIsFunc] = useState(false);
+export function CheatSheet() {
+    return (
+        <>
+            <Heading className={classes(Margins.top8, Margins.bottom8)}>Cheat Sheet</Heading>
+            {Object.entries(RegexGuide).map(([placeholder, desc]) => (
+                <Paragraph key={placeholder}>
+                    {Parser.parse("`" + placeholder + "`")}: {desc}
+                </Paragraph>
+            ))}
+        </>
+    );
+}
+
+interface ReplacementInputProps {
+    replacement: string | ReplaceFn;
+    setReplacement(v: string | ReplaceFn): void;
+}
+
+export function ReplacementInput({ replacement, setReplacement }: ReplacementInputProps) {
+    const [isFunc, setIsFunc] = useState(typeof replacement === "function");
     const [error, setError] = useState<string>();
 
     function onChange(v: string) {
@@ -32,7 +51,7 @@ export function ReplacementInput({ replacement, setReplacement, replacementError
             try {
                 const func = (0, eval)(v);
                 if (typeof func === "function")
-                    setReplacement(() => func);
+                    setReplacement(func);
 
                 else
                     setError("Replacement must be a function");
@@ -47,7 +66,7 @@ export function ReplacementInput({ replacement, setReplacement, replacementError
 
     useEffect(() => {
         if (isFunc)
-            onChange(replacement);
+            onChange(replacement.toString());
         else
             setError(void 0);
     }, [isFunc]);
@@ -56,22 +75,10 @@ export function ReplacementInput({ replacement, setReplacement, replacementError
         <>
             <Heading className={Margins.bottom8}>Replacement</Heading>
             <TextInput
-                value={replacement?.toString()}
+                value={replacement.toString()}
                 onChange={onChange}
-                error={error ?? replacementError}
+                error={error}
             />
-            {!isFunc && (
-                <div>
-                    <Heading className={classes(Margins.top8, Margins.bottom8)}>Cheat Sheet</Heading>
-
-                    {Object.entries(RegexGuide).map(([placeholder, desc]) => (
-                        <Paragraph key={placeholder}>
-                            {Parser.parse("`" + placeholder + "`")}: {desc}
-                        </Paragraph>
-                    ))}
-                </div>
-            )}
-
             <FormSwitch
                 className={Margins.top16}
                 value={isFunc}
