@@ -20,10 +20,10 @@ import { isSettingDisabled } from "@api/PluginManager";
 import { PluginSettingSliderDef } from "@utils/types";
 import { React, Slider, useState } from "@webpack/common";
 
-import { resolveError, SettingProps, SettingsSection } from "./Common";
+import { resolveError, SettingProps, SettingsSection, useSettingState } from "./Common";
 
 export function SliderSetting({ setting, pluginSettings, definedSettings, id, onChange }: SettingProps<PluginSettingSliderDef>) {
-    const def = pluginSettings[id] ?? setting.default;
+    const [value, setValue] = useSettingState<number>(pluginSettings[id] ?? setting.default);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +43,8 @@ export function SliderSetting({ setting, pluginSettings, definedSettings, id, on
                 markers={setting.markers}
                 minValue={setting.markers[0]}
                 maxValue={setting.markers[setting.markers.length - 1]}
-                initialValue={def}
+                value={value}
+                asValueChanges={setValue}
                 onValueChange={handleChange}
                 onValueRender={(v: number) => String(v.toFixed(2))}
                 stickToMarkers={setting.stickToMarkers ?? true}
