@@ -37,18 +37,12 @@ export const VENCORD_NOTICE_TYPE = "VencordNotice";
 export const noticesQueue: Notice[] = [];
 export let currentNotice: Notice | undefined = undefined;
 
-export function dismissNotice(notice?: Pick<Notice, "id" | "type">) {
-    return FluxDispatcher.dispatch({ type: "NOTICE_DISMISS", ...notice });
+export function dismissNotice(notice?: Pick<Notice, "id">) {
+    return FluxDispatcher.dispatch({ type: "NOTICE_DISMISS", id: notice?.id });
 }
 
-export async function popNotice() {
-    const notice = currentNotice;
-    if (notice) {
-        currentNotice = undefined;
-        await dismissNotice(notice);
-    }
-
-    nextNotice();
+export function popNotice() {
+    if (currentNotice) return dismissNotice(currentNotice);
 }
 
 export function nextNotice() {
@@ -77,12 +71,14 @@ export function showNotice(messageOrNotice: ReactNode | Omit<Notice, "id" | "typ
         ? messageOrNotice
         : buildLegacyNotice(messageOrNotice, buttonText!, onOkClick!);
 
-    if (!isPrimitiveReactNode(notice.message))
-        messageOrNotice = <ErrorBoundary fallback={() => "Error Showing Notice"}>{notice.message}</ErrorBoundary>;
+    const message = isPrimitiveReactNode(notice.message)
+        ? notice.message
+        : <ErrorBoundary fallback={() => "Error Showing Notice"}>{notice.message}</ErrorBoundary>;
 
     noticesQueue.push({
         id: crypto.randomUUID(),
         ...notice,
+        message,
         type: VENCORD_NOTICE_TYPE
     });
 

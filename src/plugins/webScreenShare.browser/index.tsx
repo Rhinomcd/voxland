@@ -313,6 +313,8 @@ export default definePlugin({
         navigator.mediaDevices.getDisplayMedia = openScreenSharePicker;
     },
     stop() {
+        if (!originalGetDisplayMedia) return;
+
         navigator.mediaDevices.getDisplayMedia = originalGetDisplayMedia;
     },
 
