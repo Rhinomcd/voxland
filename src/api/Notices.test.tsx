@@ -7,21 +7,24 @@
 import type { Notice } from "@vencord/discord-types";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
-const shown: string[] = [];
-let storeNotice: Notice | null = null;
+type NoticesModule = typeof import("./Notices");
+
+let Notices: NoticesModule;
+let storeNotice: Notice | null;
+let storeAdvances: boolean;
 
 const ErrorBoundary = vi.hoisted(() => () => null);
 vi.mock("@components/ErrorBoundary", () => ({ default: ErrorBoundary }));
 vi.mock("@webpack", () => ({ filters: { byCode: () => () => false, byProps: () => () => false }, mapMangledModuleLazy: () => ({}) }));
 vi.mock("@webpack/common", () => ({
     FluxDispatcher: {
-        async dispatch(action: { type: string; notice?: Notice; }) {
+        async dispatch(action: { type: string; notice?: Notice; id?: string; }) {
             if (action.type === "NOTICE_SHOW") {
                 storeNotice = action.notice!;
-                shown.push(String(action.notice!.message));
-            } else if (action.type === "NOTICE_DISMISS" && storeNotice?.type === Notices.VENCORD_NOTICE_TYPE) {
+            } else if (action.type === "NOTICE_DISMISS" && storeNotice && (action.id == null || action.id === storeNotice.id)) {
+                const wasVencordNotice = storeNotice.type === Notices.VENCORD_NOTICE_TYPE;
                 storeNotice = null;
-                Notices.nextNotice();
+                if (wasVencordNotice && storeAdvances) Notices.nextNotice();
             }
         }
     }
@@ -29,26 +32,34 @@ vi.mock("@webpack/common", () => ({
 
 vi.stubGlobal("VencordCreateElement", (type: unknown, props: object, ...children: unknown[]) => ({ type, props: { ...props, children } }));
 
-const Notices = await import("./Notices");
+const show = (message: string) => Notices.showNotice({ message, buttonText: "OK", callback: () => { } });
 
 describe("Notices queue", () => {
-    beforeEach(() => {
-        shown.length = 0;
+    beforeEach(async () => {
+        vi.resetModules();
+        Notices = await import("./Notices");
         storeNotice = null;
-        Notices.noticesQueue.length = 0;
+        storeAdvances = true;
     });
 
-    it("shows every queued notice once when each is popped", async () => {
-        for (const message of ["X", "A", "B"])
-            Notices.showNotice({ message, buttonText: "OK", callback: () => { } });
+    it("advances one notice per pop and clears the store after the last", async () => {
+        ["X", "A", "B"].forEach(show);
+        expect(storeNotice?.message).toBe("X");
+
+        for (const next of ["A", "B", undefined]) {
+            await Notices.popNotice();
+            expect(Notices.currentNotice?.message).toBe(next);
+            expect(storeNotice?.message).toBe(next);
+        }
+    });
+
+    it("advances itself when the store patch did not", async () => {
+        storeAdvances = false;
+        ["X", "A"].forEach(show);
 
         await Notices.popNotice();
-        await Notices.popNotice();
-        await Notices.popNotice();
-
-        expect(shown).toEqual(["X", "A", "B"]);
-        expect(Notices.currentNotice).toBeUndefined();
-        expect(storeNotice).toBeNull();
+        expect(Notices.currentNotice?.message).toBe("A");
+        expect(storeNotice?.message).toBe("A");
     });
 
     it("wraps non-primitive messages in an ErrorBoundary", () => {

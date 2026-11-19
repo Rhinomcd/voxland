@@ -41,8 +41,12 @@ export function dismissNotice(notice?: Pick<Notice, "id">) {
     return FluxDispatcher.dispatch({ type: "NOTICE_DISMISS", id: notice?.id });
 }
 
-export function popNotice() {
-    if (currentNotice) return dismissNotice(currentNotice);
+export async function popNotice() {
+    const notice = currentNotice;
+    if (!notice) return;
+
+    await dismissNotice(notice);
+    if (currentNotice === notice) nextNotice();
 }
 
 export function nextNotice() {
