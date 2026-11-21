@@ -71,7 +71,7 @@ const stub = new Proxy(function () { }, {
 });
 const g = /** @type {any} */ (globalThis);
 g.window = g;
-for (const name of ["document", "navigator", "localStorage", "location", "VencordNative", "Worker", "MutationObserver", "HTMLElement", "Element", "Node"]) {
+for (const name of ["document", "navigator", "localStorage", "location", "VencordNative", "VesktopNative", "Worker", "MutationObserver", "HTMLElement", "Element", "Node"]) {
     Object.defineProperty(g, name, { value: stub, configurable: true });
 }
 vm.runInThisContext(outputFiles[0].text);

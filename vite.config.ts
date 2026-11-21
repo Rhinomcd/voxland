@@ -10,8 +10,11 @@ export default defineConfig({
     resolve: {
         tsconfigPaths: true,
     },
+    oxc: {
+        jsx: { runtime: "classic", pragma: "VencordCreateElement", pragmaFrag: "VencordFragment" },
+    },
     test: {
-        include: ["src/**/*.test.ts"],
+        include: ["src/**/*.test.{ts,tsx}"],
     },
     fmt: {},
     lint: {
@@ -202,7 +205,6 @@ export default defineConfig({
                     "src/plugins/shikiCodeblocks.desktop/previewExample.tsx",
                     "src/utils/apng.ts",
                     "src/utils/intlHash.ts",
-                    "src/plugins/youtubeAdblock.desktop/adguard.js",
                     "browser/userscript.meta.js",
                 ],
                 rules: {
