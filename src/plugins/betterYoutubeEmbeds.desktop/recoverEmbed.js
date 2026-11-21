@@ -19,10 +19,15 @@
 
     const identityDenied = playability?.errorCode === "PLAYABILITY_ERROR_CODE_EMBEDDER_IDENTITY_DENIED";
     if (location.hostname === "www.youtube-nocookie.com") {
-        // Avoid infinite reload loops by only reloading once, and only if the referrer is the main YouTube site from below
-        const reloadKey = "VencordBetterYouTubeEmbedsReloaded";
-        if (identityDenied && document.referrer.startsWith("https://www.youtube.com/") && !sessionStorage.getItem(reloadKey)) {
-            sessionStorage.setItem(reloadKey, "1");
+        // Avoid infinite reload loops by only reloading each video once, and only if the referrer is the main YouTube site from below
+        if (identityDenied && document.referrer.startsWith("https://www.youtube.com/")) {
+            const reloadKey = "VencordBetterYouTubeEmbedsReloaded:" + location.pathname;
+            try {
+                if (sessionStorage.getItem(reloadKey)) return;
+                sessionStorage.setItem(reloadKey, "1");
+            } catch {
+                return;
+            }
             location.reload();
         }
         return;
