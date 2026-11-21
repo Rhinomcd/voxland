@@ -78,8 +78,8 @@ export function showNotice(messageOrNotice: ReactNode | NoticeOptions, buttonTex
         : <ErrorBoundary fallback={() => "Error Showing Notice"}>{notice.message}</ErrorBoundary>;
 
     const fullNotice: Notice = {
-        id: crypto.randomUUID(),
         ...notice,
+        id: notice.id ?? crypto.randomUUID(),
         message,
         buttonText: notice.buttonText || "Dismiss",
         callback(event: MouseEvent<HTMLButtonElement>) {

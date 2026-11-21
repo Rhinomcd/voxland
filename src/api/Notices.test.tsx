@@ -62,6 +62,35 @@ describe("Notices queue", () => {
         expect(storeNotice?.message).toBe("A");
     });
 
+    it("advances once when the button dismisses, by default or from a custom callback", async () => {
+        const seen: unknown[] = [];
+        Notices.showNotice({ message: "X" });
+        Notices.showNotice({ message: "A", callback: ({ event, dismiss }) => { seen.push(event); return dismiss(); } });
+        Notices.showNotice("B", undefined!, () => { });
+        Notices.showNotice({ message: "C" });
+
+        const click = () => Notices.currentNotice!.callback!({} as never);
+        expect(Notices.currentNotice?.buttonText).toBe("Dismiss");
+        click();
+        await vi.waitFor(() => expect(Notices.currentNotice?.message).toBe("A"));
+
+        const a = Notices.currentNotice!;
+        a.callback!("click" as never);
+        await vi.waitFor(() => expect(Notices.currentNotice?.message).toBe("B"));
+        expect(seen).toEqual(["click"]);
+
+        a.callback!({} as never);
+        await Promise.resolve();
+        expect(Notices.currentNotice?.message).toBe("B");
+        expect(Notices.currentNotice?.buttonText).toBe("Dismiss");
+        expect(storeNotice?.message).toBe("B");
+    });
+
+    it("keeps a generated id when the caller passes id: undefined", () => {
+        Notices.showNotice({ message: "X", id: undefined });
+        expect(Notices.currentNotice?.id).toEqual(expect.any(String));
+    });
+
     it("wraps non-primitive messages in an ErrorBoundary", () => {
         const message = <span />;
         Notices.showNotice({ message, buttonText: "OK", callback: () => { } });

@@ -20,7 +20,7 @@ function isFeatureEnabled(feature: "fixBlockedEmbeds" | "blockAds") {
     }
 
     // old plugins before merge
-    return !!(FixYoutubeEmbeds?.enabled || YoutubeAdblock?.enabled);
+    return !!(feature === "fixBlockedEmbeds" ? FixYoutubeEmbeds : YoutubeAdblock)?.enabled;
 }
 
 function runScript(frame: WebFrameMain, script: string) {

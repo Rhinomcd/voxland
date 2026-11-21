@@ -25,7 +25,11 @@ const settings = definePluginSettings({
 const { plugins } = SettingsStore.plain;
 const { BetterYouTubeEmbeds, FixYoutubeEmbeds, YoutubeAdblock } = plugins;
 if (!BetterYouTubeEmbeds && (FixYoutubeEmbeds?.enabled || YoutubeAdblock?.enabled)) {
-    plugins.BetterYouTubeEmbeds = { enabled: true };
+    plugins.BetterYouTubeEmbeds = {
+        enabled: true,
+        fixBlockedEmbeds: !!FixYoutubeEmbeds?.enabled,
+        blockAds: !!YoutubeAdblock?.enabled
+    };
     SettingsStore.markAsChanged();
 }
 
