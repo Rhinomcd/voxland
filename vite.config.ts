@@ -205,7 +205,6 @@ export default defineConfig({
                     "src/plugins/shikiCodeblocks.desktop/previewExample.tsx",
                     "src/utils/apng.ts",
                     "src/utils/intlHash.ts",
-                    "src/plugins/youtubeAdblock.desktop/adguard.js",
                     "browser/userscript.meta.js",
                 ],
                 rules: {
