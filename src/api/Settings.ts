@@ -84,13 +84,6 @@ export interface Settings {
         useNative: "always" | "never" | "not-focused";
         logLimit: number;
     };
-
-    cloud: {
-        authenticated: boolean;
-        url: string;
-        settingsSync: boolean;
-        settingsSyncVersion: number;
-    };
 }
 
 const DefaultSettings: Settings = {
@@ -120,13 +113,6 @@ const DefaultSettings: Settings = {
         position: "bottom-right",
         useNative: "not-focused",
         logLimit: 50
-    },
-
-    cloud: {
-        authenticated: false,
-        url: "https://api.vencord.dev/",
-        settingsSync: false,
-        settingsSyncVersion: 0
     }
 };
 
@@ -174,7 +160,6 @@ export const SettingsStore = new SettingsStoreClass(settings, {
 
 if (!IS_REPORTER) {
     SettingsStore.addGlobalChangeListener((_, path) => {
-        SettingsStore.plain.cloud.settingsSyncVersion = Date.now();
         VencordNative.settings.set(SettingsStore.plain, path);
     });
 }

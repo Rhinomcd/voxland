@@ -5,7 +5,7 @@
     "description": "The cutest Discord client mod",
     "homepage": "https://github.com/Vendicated/Vencord#readme",
     "bugs": {
-        "url": "https://github.com/Vendicated/Vencord/issues"
+        "url": "https://github.com/Rhinomcd/voxland/issues"
     },
     "license": "GPL-3.0-or-later",
     "author": "Vendicated",
@@ -26,8 +26,6 @@
         "watchWeb": "vp run buildWeb --watch",
         "generatePluginJson": "vpx scripts/generatePluginList.ts",
         "generateTypes": "tspc --emitDeclarationOnly --declaration --outDir packages/vencord-types --allowJs false",
-        "inject": "node scripts/runInstaller.mjs -- --install",
-        "uninject": "node scripts/runInstaller.mjs -- --uninstall",
         "lint": "vp lint",
         "fmt": "vp fmt \"**/*.{css,html,json,yml,yaml}\"",
         "fmt:check": "vp run fmt --check",
