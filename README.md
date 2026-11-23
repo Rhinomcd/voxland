@@ -50,6 +50,8 @@ vp run build --dev
 
 Then point voxland-desktop's `vencordDir` at `dist`, or load `dist/chromium-unpacked` or `dist/firefox-unpacked` as a browser extension (`vp run buildWeb` builds them).
 
+If you injected an older Voxland build into Discord with `vp run inject`, reinstall Discord to remove it.
+
 ## Community
 
 Ask questions in [Q&A](https://github.com/Rhinomcd/voxland/discussions/categories/q-a), propose features and plugins in [Ideas](https://github.com/Rhinomcd/voxland/discussions/categories/ideas), and report bugs in [issues](https://github.com/Rhinomcd/voxland/issues). Don't report Voxland bugs to Vencord.

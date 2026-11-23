@@ -41,7 +41,7 @@ body:
       id: environment
       attributes:
           label: Environment
-          description: Voxland version or commit, Discord branch (Stable, PTB, Canary), and how you run it (voxland-desktop, browser extension, or injected into the Discord app).
+          description: Voxland version or commit, Discord branch (Stable, PTB, Canary), and how you run it (voxland-desktop or browser extension).
           placeholder: voxland-desktop 1.0.0 on Arch Linux, Discord Stable
       validations:
           required: true
