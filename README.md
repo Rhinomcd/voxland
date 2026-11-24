@@ -34,20 +34,23 @@ These apply to every PR, whether a person, an agent, or both wrote it.
 
 ## Features
 
--   Everything Vencord has: 100+ built-in plugins, custom CSS and themes, settings sync, and no telemetry
+-   Everything Vencord has: 100+ built-in plugins, custom CSS and themes, settings backup, and no telemetry
 -   Tracks Vencord closely through regular upstream merges
 
 ## Installing
 
-There are no Voxland releases yet. Build from source and inject it into your Discord install. You need [Vite+](https://viteplus.dev/guide/) (`curl -fsSL https://vite.plus | bash`), which also manages Node.js and pnpm:
+There are no Voxland releases yet. Voxland runs in [voxland-desktop](https://github.com/Rhinomcd/voxland-desktop), the Linux desktop app, which builds and installs both repos with its `scripts/channel.sh`.
+
+To build the mod yourself, you need [Vite+](https://viteplus.dev/guide/) (`curl -fsSL https://vite.plus | bash`), which also manages Node.js and pnpm:
 
 ```sh
 vp install
 vp run build --dev
-vp run inject
 ```
 
-For the Linux desktop app, see [voxland-desktop](https://github.com/Rhinomcd/voxland-desktop).
+Then point voxland-desktop's `vencordDir` at `dist`, or load `dist/chromium-unpacked` or `dist/firefox-unpacked` as a browser extension (`vp run buildWeb` builds them).
+
+If you injected an older Voxland build into Discord with `vp run inject`, reinstall Discord to remove it.
 
 ## Community
 
