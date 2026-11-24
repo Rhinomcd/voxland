@@ -47,7 +47,7 @@ function VesktopSection() {
                 <Heading className={Margins.bottom8}>Vesktop & Voxland</Heading>
                 <Paragraph>Vesktop and Voxland are two separate things. This updater is for Voxland.</Paragraph>
                 <Paragraph className={Margins.top8}>
-                    You receive separate popups for Vesktop updates. You can also manually update by installing the <Link href="https://vesktop.dev/install">latest version</Link>.
+                    You receive separate popups for Vesktop updates. You can also update manually with <Link href="https://github.com/Rhinomcd/voxland-desktop">voxland-desktop</Link>'s channel.sh.
                 </Paragraph>
             </Card>
 
