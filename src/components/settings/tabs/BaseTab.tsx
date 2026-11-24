@@ -33,7 +33,7 @@ export const handleSettingsTabError = onlyOnce(handleComponentFailed);
 export function wrapTab(component: ComponentType<any>, tab: string) {
     const wrapped = ErrorBoundary.wrap(component, {
         displayName: `${tab}SettingsTab`,
-        message: `Failed to render the ${tab} tab. If this issue persists, rebuild Voxland and reload.`,
+        message: `Failed to render the ${tab} tab. If this issue persists, rebuild Voxland, then restart the desktop app or reload the browser extension.`,
         onError: handleSettingsTabError,
     });
 
