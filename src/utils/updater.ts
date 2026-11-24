@@ -83,6 +83,6 @@ export async function maybePromptToUpdate(confirmMessage: string, checkForDev = 
         }
     } catch (err) {
         UpdateLogger.error(err);
-        alert("That also failed :( Rebuild Voxland, or reinstall it with voxland-desktop's scripts/channel.sh.");
+        alert("That also failed :( Rebuild Voxland, or reinstall it with voxland-desktop's scripts/channel.sh --force.");
     }
 }
