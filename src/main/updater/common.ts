@@ -50,20 +50,27 @@ export function serializeErrors(func: (...args: any[]) => any) {
 /**
  * Keeps reporting a fetched update until it applies. The git updater pulls before it builds,
  * so after a failed build a second pull finds nothing and the update would never be retried.
+ * Overlapping calls from the tray and the renderer share one pull and one build.
  */
 export function retainFetchedUpdate(source: Updater): Updater {
     let isPending = false;
+    let fetching: Promise<boolean> | undefined;
+    let applying: Promise<boolean> | undefined;
 
     return {
         ...source,
-        async fetchUpdate() {
-            isPending ||= await source.fetchUpdate();
-            return isPending;
+        fetchUpdate() {
+            return fetching ??= source.fetchUpdate()
+                .then(fetched => isPending ||= fetched)
+                .finally(() => fetching = undefined);
         },
-        async applyUpdate() {
-            const applied = await source.applyUpdate();
-            if (applied) isPending = false;
-            return applied;
+        applyUpdate() {
+            return applying ??= source.applyUpdate()
+                .then(applied => {
+                    if (applied) isPending = false;
+                    return applied;
+                })
+                .finally(() => applying = undefined);
         }
     };
 }
