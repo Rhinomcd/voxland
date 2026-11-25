@@ -56,19 +56,19 @@ const notify = (window: BaseWindow | undefined, title: string, message: string) 
 
 let isUpdating = false;
 
-function createVencordMenuItems(): MenuItemConstructorOptions[] {
+function createVoxlandMenuItems(): MenuItemConstructorOptions[] {
     return [
         { type: "separator" },
         {
-            id: "vencord",
-            label: "Vencord",
+            id: "voxland",
+            label: "Voxland",
             submenu: [
                 {
-                    label: "About Vencord",
+                    label: "About Voxland",
                     click: () => openAboutWindow()
                 },
                 {
-                    label: "Update Vencord",
+                    label: "Update Voxland",
                     visible: !IS_UPDATER_DISABLED,
                     async click(_item, window) {
                         if (isUpdating) return;
@@ -77,19 +77,19 @@ function createVencordMenuItems(): MenuItemConstructorOptions[] {
                         try {
                             const updateAvailable = await updater.fetchUpdate();
                             if (!updateAvailable) {
-                                return notify(window, "No Update Available", "You are already using the latest version of Vencord.");
+                                return notify(window, "No Update Available", "You are already using the latest version of Voxland.");
                             }
 
                             const result = await updater.applyUpdate();
                             if (!result) {
-                                return notify(window, "Update Failed", "Failed to apply the update for Vencord.");
+                                return notify(window, "Update Failed", "Failed to apply the update for Voxland.");
                             }
 
-                            await notify(window, "Update Successful", "Now relaunching Vencord to apply the update.");
+                            await notify(window, "Update Successful", "Now relaunching Voxland to apply the update.");
                             app.relaunch();
                             app.exit();
                         } catch (e) {
-                            notify(window, "Update Error", `An error occurred while updating Vencord.\n\n${String(e)}`);
+                            notify(window, "Update Error", `An error occurred while updating Voxland.\n\n${String(e)}`);
                         } finally {
                             isUpdating = false;
                         }
@@ -113,10 +113,10 @@ export function patchTrayMenu(): void {
     const originalBuildFromTemplate = Menu.buildFromTemplate;
 
     Menu.buildFromTemplate = function (template: MenuItemConstructorOptions[]) {
-        if (isTrayMenu(template) && !template.some(item => item.id === "vencord")) {
+        if (isTrayMenu(template) && !template.some(item => item.id === "voxland")) {
             const separatorIndex = template.findIndex(item => item.type === "separator");
             const insertIndex = separatorIndex !== -1 ? separatorIndex : template.length - 1;
-            template.splice(insertIndex, 0, ...createVencordMenuItems());
+            template.splice(insertIndex, 0, ...createVoxlandMenuItems());
         }
 
         return originalBuildFromTemplate.call(this, template);
