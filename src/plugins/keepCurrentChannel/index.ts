@@ -46,15 +46,14 @@ function save(data: PreviousChannel) {
     DataStore.set("KeepCurrentChannel_previousData", data);
 }
 
-function restore({ channelId, guildId }: PreviousChannel) {
-    if (!channelId || !ChannelStore.hasChannel(channelId)) {
-        if (guildId === "@favorites") {
-            NavigationRouter.transitionToGuild("@favorites");
-        }
-        return;
+function restore({ channelId, guildId }: PreviousChannel, fallbackGuildId?: string) {
+    if (channelId && ChannelStore.hasChannel(channelId)) {
+        NavigationRouter.transitionToGuild(guildId || "@me", channelId);
+    } else if (guildId === "@favorites") {
+        NavigationRouter.transitionToGuild("@favorites");
+    } else if (fallbackGuildId) {
+        NavigationRouter.transitionToGuild(fallbackGuildId);
     }
-
-    NavigationRouter.transitionToGuild(guildId || "@me", channelId);
 }
 
 export default definePlugin({
@@ -82,8 +81,9 @@ export default definePlugin({
             if (!isSwitchingAccount) return;
             isSwitchingAccount = false;
 
+            // The patch disables Discord's own redirect home after an account switch
             if (previousCache)
-                restore(previousCache);
+                restore(previousCache, "@me");
         },
 
         async CHANNEL_SELECT({ guildId, channelId }: ChannelSelectEvent) {
