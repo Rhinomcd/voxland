@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import type { Updater } from ".";
+
 export const VENCORD_FILES = [
     IS_DISCORD_DESKTOP ? "patcher.js" : "vencordDesktopMain.js",
     IS_DISCORD_DESKTOP ? "preload.js" : "vencordDesktopPreload.js",
@@ -41,6 +43,27 @@ export function serializeErrors(func: (...args: any[]) => any) {
                     stack: e.stack
                 } : e
             };
+        }
+    };
+}
+
+/**
+ * Keeps reporting a fetched update until it applies. The git updater pulls before it builds,
+ * so after a failed build a second pull finds nothing and the update would never be retried.
+ */
+export function retainFetchedUpdate(source: Updater): Updater {
+    let isPending = false;
+
+    return {
+        ...source,
+        async fetchUpdate() {
+            isPending ||= await source.fetchUpdate();
+            return isPending;
+        },
+        async applyUpdate() {
+            const applied = await source.applyUpdate();
+            if (applied) isPending = false;
+            return applied;
         }
     };
 }

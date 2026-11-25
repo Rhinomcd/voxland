@@ -19,7 +19,7 @@
 import { IpcEvents } from "@shared/IpcEvents";
 import { ipcMain } from "electron";
 
-import { serializeErrors } from "./common";
+import { retainFetchedUpdate, serializeErrors } from "./common";
 
 export type UpdateData = Record<"hash" | "message" | "author", string>;
 
@@ -37,7 +37,7 @@ const NoopUpdater: Updater = {
     applyUpdate: async () => false,
 };
 
-const updater = IS_UPDATER_DISABLED ? NoopUpdater : require(IS_STANDALONE ? "./http" : "./git").default as Updater;
+const updater = retainFetchedUpdate(IS_UPDATER_DISABLED ? NoopUpdater : require(IS_STANDALONE ? "./http" : "./git").default as Updater);
 
 ipcMain.handle(IpcEvents.UPDATER_GET_REPO, serializeErrors(updater.getRepo));
 ipcMain.handle(IpcEvents.UPDATER_LIST_UPDATES, serializeErrors(updater.listUpdates));

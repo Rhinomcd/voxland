@@ -55,7 +55,6 @@ const notify = (window: BaseWindow | undefined, title: string, message: string) 
         : dialog.showMessageBox({ title, message });
 
 let isUpdating = false;
-let isFetchedUpdatePending = false;
 
 function createVoxlandMenuItems(): MenuItemConstructorOptions[] {
     return [
@@ -76,13 +75,12 @@ function createVoxlandMenuItems(): MenuItemConstructorOptions[] {
                         isUpdating = true;
 
                         try {
-                            if (!isFetchedUpdatePending && !await updater.fetchUpdate()) {
+                            const updateAvailable = await updater.fetchUpdate();
+                            if (!updateAvailable) {
                                 return notify(window, "No Update Available", "You are already using the latest version of Voxland.");
                             }
-                            isFetchedUpdatePending = true;
 
                             const result = await updater.applyUpdate();
-                            isFetchedUpdatePending = !result;
                             if (!result) {
                                 return notify(window, "Update Failed", "Failed to apply the update for Voxland.");
                             }
