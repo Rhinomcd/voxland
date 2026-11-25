@@ -50,27 +50,40 @@ export function serializeErrors(func: (...args: any[]) => any) {
 /**
  * Keeps reporting a fetched update until it applies. The git updater pulls before it builds,
  * so after a failed build a second pull finds nothing and the update would never be retried.
- * Overlapping calls from the tray and the renderer share one pull and one build.
+ * Pulls and builds run one at a time, so a pull never lands under a running build,
+ * and overlapping calls from the tray and the renderer share one pull or one build.
  */
 export function retainFetchedUpdate(source: Updater): Updater {
     let isPending = false;
+    let queue: Promise<unknown> = Promise.resolve();
     let fetching: Promise<boolean> | undefined;
     let applying: Promise<boolean> | undefined;
+
+    function exclusive<T>(run: () => Promise<T>) {
+        const result = queue.then(run);
+        queue = result.catch(() => { });
+        return result;
+    }
 
     return {
         ...source,
         fetchUpdate() {
-            return fetching ??= source.fetchUpdate()
-                .then(fetched => isPending ||= fetched)
-                .finally(() => fetching = undefined);
+            return fetching ??= exclusive(async () => {
+                try {
+                    const fetched = await source.fetchUpdate();
+                    isPending ||= fetched;
+                } catch (e) {
+                    if (!isPending) throw e;
+                }
+                return isPending;
+            }).finally(() => fetching = undefined);
         },
         applyUpdate() {
-            return applying ??= source.applyUpdate()
-                .then(applied => {
-                    if (applied) isPending = false;
-                    return applied;
-                })
-                .finally(() => applying = undefined);
+            return applying ??= exclusive(async () => {
+                const applied = await source.applyUpdate();
+                if (applied) isPending = false;
+                return applied;
+            }).finally(() => applying = undefined);
         }
     };
 }

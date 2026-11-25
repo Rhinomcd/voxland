@@ -78,3 +78,37 @@ it("shares one build between overlapping applies", async () => {
     expect(await Promise.all([renderer, tray])).toEqual([true, true]);
     expect(source.applyUpdate).toHaveBeenCalledTimes(1);
 });
+
+it("pulls only after a running build finishes, then builds what it pulled", async () => {
+    const source = makeSource();
+    const build = deferred<boolean>();
+    source.applyUpdate.mockReturnValueOnce(build.promise);
+    const updater = retainFetchedUpdate(source);
+
+    await updater.fetchUpdate();
+    const renderer = updater.applyUpdate();
+    const trayFetch = updater.fetchUpdate();
+    await Promise.resolve();
+    expect(source.fetchUpdate).toHaveBeenCalledTimes(1);
+
+    build.resolve(true);
+    expect(await renderer).toBe(true);
+    expect(await trayFetch).toBe(true);
+    expect(await updater.applyUpdate()).toBe(true);
+    expect(source.fetchUpdate).toHaveBeenCalledTimes(2);
+    expect(source.applyUpdate).toHaveBeenCalledTimes(2);
+});
+
+it("retries a pending build when the pull fails", async () => {
+    const source = makeSource();
+    source.applyUpdate.mockResolvedValueOnce(false);
+    const updater = retainFetchedUpdate(source);
+
+    await updater.fetchUpdate();
+    await updater.applyUpdate();
+    source.fetchUpdate.mockRejectedValue(new Error("offline"));
+
+    expect(await updater.fetchUpdate()).toBe(true);
+    expect(await updater.applyUpdate()).toBe(true);
+    await expect(updater.fetchUpdate()).rejects.toThrow("offline");
+});
