@@ -28,3 +28,21 @@ ConsoleShortcuts exposes helpers for interacting with webpack, most notably:
 Run `shortcutList` for the full list.
 
 Module IDs can change between Discord builds. Never hardcode them.
+
+## Testing patches
+
+Once Discord has loaded with ConsoleShortcuts enabled, call `window.testPatch(patch)` in the Discord page context. Pass a patch object with a string or RegExp `find` and one replacement or an array of replacements. Each replacement accepts a string or RegExp `match` and a string or function `replace`.
+
+```js
+window.testPatch({
+    find: "uniqueModuleMarker",
+    replacement: {
+        match: /(\i)\.oldMethod\(\)/,
+        replace: "$1.newMethod()",
+    },
+});
+```
+
+The helper searches loaded webpack factory source and requires exactly one match. It applies replacements in order, checks that each changes the source, and syntax-checks the result of each step. It supports `\i`, intl keys, and `$self`. Pass `plugin: "PluginName"` to resolve `$self` to a specific plugin.
+
+Read `{ ok: true, moduleId, patchedSource }` on success or `{ ok: false, error }` on failure. Replacement errors include the one-based replacement index. The check uses a copy of the factory source and compiles it for syntax only. Test runtime behavior separately with the plugin enabled.
