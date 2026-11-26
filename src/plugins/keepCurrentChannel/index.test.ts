@@ -9,10 +9,14 @@ import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 const knownChannels = new Set<string>();
 const transitionToGuild = vi.fn();
 let stored: unknown;
+let writeError: Error | undefined;
 
 vi.mock("@api/DataStore", () => ({
     get: async () => stored,
-    set: async (_key: string, value: unknown) => { stored = value; }
+    set: async (_key: string, value: unknown) => {
+        if (writeError) throw writeError;
+        stored = value;
+    }
 }));
 vi.mock("@webpack/common", () => ({
     ChannelStore: { hasChannel: (id: string) => knownChannels.has(id) },
@@ -58,5 +62,18 @@ describe("KeepCurrentChannel account switch", () => {
         stored = { guildId: "1", channelId: "2" };
         await plugin.start!();
         expect(transitionToGuild).not.toHaveBeenCalled();
+    });
+});
+
+describe("KeepCurrentChannel persistence", () => {
+    it("rejects CHANNEL_SELECT when the write fails, so the plugin logger records it", async () => {
+        stored = { guildId: "1", channelId: "2" };
+        await plugin.start!();
+        writeError = new Error("quota exceeded");
+        try {
+            await expect(flux.CHANNEL_SELECT!({ type: "CHANNEL_SELECT", guildId: "1", channelId: "3" })).rejects.toThrow("quota exceeded");
+        } finally {
+            writeError = undefined;
+        }
     });
 });

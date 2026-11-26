@@ -43,7 +43,7 @@ let previousCache: PreviousChannel | undefined;
 
 function save(data: PreviousChannel) {
     previousCache = data;
-    DataStore.set("KeepCurrentChannel_previousData", data);
+    return DataStore.set("KeepCurrentChannel_previousData", data);
 }
 
 function restore({ channelId, guildId }: PreviousChannel, fallbackGuildId?: string) {
@@ -89,7 +89,7 @@ export default definePlugin({
         async CHANNEL_SELECT({ guildId, channelId }: ChannelSelectEvent) {
             if (isSwitchingAccount || !didStart) return;
 
-            save({
+            await save({
                 guildId,
                 channelId
             });
@@ -99,7 +99,7 @@ export default definePlugin({
     async start() {
         previousCache = await DataStore.get<PreviousChannel>("KeepCurrentChannel_previousData");
         if (!previousCache) {
-            save({
+            await save({
                 guildId: SelectedGuildStore.getGuildId(),
                 channelId: SelectedChannelStore.getChannelId() ?? null
             });
