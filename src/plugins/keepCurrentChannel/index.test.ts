@@ -71,15 +71,17 @@ describe("KeepCurrentChannel account switch", () => {
 
 describe("KeepCurrentChannel persistence", () => {
     it("starts tracking even when the first save fails", async () => {
+        vi.resetModules();
+        const { default: freshPlugin } = await import(".");
         stored = undefined;
         writeError = new Error("quota exceeded");
         try {
-            await plugin.start!();
+            await freshPlugin.start!();
         } finally {
             writeError = undefined;
         }
         await vi.waitFor(() => expect(logError).toHaveBeenCalledWith("Failed to save the current channel", expect.any(Error)));
-        await flux.CHANNEL_SELECT!({ type: "CHANNEL_SELECT", guildId: "1", channelId: "3" });
+        await freshPlugin.flux!.CHANNEL_SELECT!({ type: "CHANNEL_SELECT", guildId: "1", channelId: "3" });
         expect(stored).toEqual({ guildId: "1", channelId: "3" });
     });
 
