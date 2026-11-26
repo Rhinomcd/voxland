@@ -25,7 +25,7 @@ export function findPatchTarget(find: Patch["find"]) {
     }
 
     const [moduleId] = ids;
-    const source = wrapFactorySource(candidates[moduleId].toString().replaceAll("\n", ""));
+    const source = wrapFactorySource(candidates[moduleId].toString());
     return { ok: true as const, target: { moduleId, source } };
 }
 
