@@ -18,8 +18,9 @@
 
 import * as DataStore from "@api/DataStore";
 import { Devs } from "@utils/constants";
+import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
-import { ChannelRouter, ChannelStore, NavigationRouter, SelectedChannelStore, SelectedGuildStore } from "@webpack/common";
+import { ChannelStore, NavigationRouter, SelectedChannelStore, SelectedGuildStore } from "@webpack/common";
 
 export interface LogoutEvent {
     type: "LOGOUT";
@@ -37,8 +38,24 @@ interface PreviousChannel {
     channelId: string | null;
 }
 
+let didStart = false;
 let isSwitchingAccount = false;
 let previousCache: PreviousChannel | undefined;
+
+function save(data: PreviousChannel) {
+    previousCache = data;
+    return DataStore.set("KeepCurrentChannel_previousData", data);
+}
+
+function restore({ channelId, guildId }: PreviousChannel, fallbackGuildId?: string) {
+    if (channelId && ChannelStore.hasChannel(channelId)) {
+        NavigationRouter.transitionToGuild(guildId || "@me", channelId);
+    } else if (guildId === "@favorites") {
+        NavigationRouter.transitionToGuild("@favorites");
+    } else if (fallbackGuildId) {
+        NavigationRouter.transitionToGuild(fallbackGuildId);
+    }
+}
 
 export default definePlugin({
     name: "KeepCurrentChannel",
@@ -65,37 +82,32 @@ export default definePlugin({
             if (!isSwitchingAccount) return;
             isSwitchingAccount = false;
 
-            if (previousCache?.channelId) {
-                if (ChannelStore.hasChannel(previousCache.channelId)) {
-                    ChannelRouter.transitionToChannel(previousCache.channelId);
-                } else {
-                    NavigationRouter.transitionToGuild("@me");
-                }
-            }
+            // The patch disables Discord's own redirect home after an account switch
+            if (previousCache)
+                restore(previousCache, "@me");
         },
 
         async CHANNEL_SELECT({ guildId, channelId }: ChannelSelectEvent) {
-            if (isSwitchingAccount) return;
+            if (isSwitchingAccount || !didStart) return;
 
-            previousCache = {
+            await save({
                 guildId,
                 channelId
-            };
-            await DataStore.set("KeepCurrentChannel_previousData", previousCache);
+            });
         }
     },
 
     async start() {
         previousCache = await DataStore.get<PreviousChannel>("KeepCurrentChannel_previousData");
         if (!previousCache) {
-            previousCache = {
+            save({
                 guildId: SelectedGuildStore.getGuildId(),
                 channelId: SelectedChannelStore.getChannelId() ?? null
-            };
-
-            await DataStore.set("KeepCurrentChannel_previousData", previousCache);
-        } else if (previousCache.channelId) {
-            ChannelRouter.transitionToChannel(previousCache.channelId);
+            }).catch(e => new Logger("KeepCurrentChannel").error("Failed to save the current channel", e));
+        } else {
+            restore(previousCache);
         }
+
+        didStart = true;
     }
 });

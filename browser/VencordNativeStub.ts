@@ -79,8 +79,8 @@ window.VencordNative = {
     updater: {
         getRepo: async () => ({ ok: true, value: "https://github.com/Rhinomcd/voxland" }),
         getUpdates: async () => ({ ok: true, value: [] }),
-        update: async () => ({ ok: true, value: false }),
-        rebuild: async () => ({ ok: true, value: true }),
+        fetchUpdate: async () => ({ ok: true, value: false }),
+        applyUpdate: async () => ({ ok: true, value: true }),
     },
 
     quickCss: {
