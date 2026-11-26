@@ -18,6 +18,10 @@ vi.mock("@api/DataStore", () => ({
         stored = value;
     }
 }));
+const logError = vi.fn();
+vi.mock("@utils/Logger", () => ({
+    Logger: class { error = logError; }
+}));
 vi.mock("@webpack/common", () => ({
     ChannelStore: { hasChannel: (id: string) => knownChannels.has(id) },
     NavigationRouter: { transitionToGuild },
@@ -66,6 +70,19 @@ describe("KeepCurrentChannel account switch", () => {
 });
 
 describe("KeepCurrentChannel persistence", () => {
+    it("starts tracking even when the first save fails", async () => {
+        stored = undefined;
+        writeError = new Error("quota exceeded");
+        try {
+            await plugin.start!();
+        } finally {
+            writeError = undefined;
+        }
+        await vi.waitFor(() => expect(logError).toHaveBeenCalledWith("Failed to save the current channel", expect.any(Error)));
+        await flux.CHANNEL_SELECT!({ type: "CHANNEL_SELECT", guildId: "1", channelId: "3" });
+        expect(stored).toEqual({ guildId: "1", channelId: "3" });
+    });
+
     it("rejects CHANNEL_SELECT when the write fails, so the plugin logger records it", async () => {
         stored = { guildId: "1", channelId: "2" };
         await plugin.start!();

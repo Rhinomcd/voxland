@@ -18,6 +18,7 @@
 
 import * as DataStore from "@api/DataStore";
 import { Devs } from "@utils/constants";
+import { Logger } from "@utils/Logger";
 import definePlugin from "@utils/types";
 import { ChannelStore, NavigationRouter, SelectedChannelStore, SelectedGuildStore } from "@webpack/common";
 
@@ -99,10 +100,10 @@ export default definePlugin({
     async start() {
         previousCache = await DataStore.get<PreviousChannel>("KeepCurrentChannel_previousData");
         if (!previousCache) {
-            await save({
+            save({
                 guildId: SelectedGuildStore.getGuildId(),
                 channelId: SelectedChannelStore.getChannelId() ?? null
-            });
+            }).catch(e => new Logger("KeepCurrentChannel").error("Failed to save the current channel", e));
         } else {
             restore(previousCache);
         }
