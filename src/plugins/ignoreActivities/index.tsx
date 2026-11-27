@@ -12,7 +12,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { Flex } from "@components/Flex";
 import { Heading } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
-import CustomRpcPlugin from "@plugins/customRPC";
+import { selectedProfile } from "@plugins/customRPC";
 import { Devs } from "@utils/constants";
 import { Margins } from "@utils/margins";
 import definePlugin, { OptionType } from "@utils/types";
@@ -89,7 +89,7 @@ function ImportCustomRPCComponent() {
             <div>
                 <Button
                     onClick={() => {
-                        const id = CustomRpcPlugin.settings.store.appID;
+                        const id = selectedProfile()?.appID;
                         if (!id) {
                             return showToast({ text: "CustomRPC application ID is not set.", variant: "critical" });
                         }
