@@ -18,6 +18,7 @@ export * from "./Grid";
 export * from "./Heading";
 export * from "./Icons";
 export * from "./Link";
+export * from "./List";
 export * from "./margins";
 export * from "./Paragraph";
 export * from "./settings";
